@@ -35,6 +35,7 @@ switch ($action) {
             $id = $utilisateur['id'];
             $nom = $utilisateur['nom'];
             $prenom = $utilisateur['prenom'];
+            $type = isset($utilisateur['type']) ? $utilisateur['type'] : 'visiteur';
             Utilitaires::connecter($id, $nom, $prenom);
             header('Location: index.php');
             exit(); 
