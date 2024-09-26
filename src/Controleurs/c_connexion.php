@@ -14,15 +14,16 @@
  * @version   GIT: <0>
  * @link      http://www.reseaucerta.org Contexte « Laboratoire GSB »
  */
-
 use Outils\Utilitaires;
 
 $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-if (!$uc) {
+if (!$uc)
+{
     $uc = 'demandeconnexion';
 }
 
-switch ($action) {
+switch ($action)
+{
     case 'demandeConnexion':
         include PATH_VIEWS . 'v_connexion.php';
         break;
@@ -30,11 +31,14 @@ switch ($action) {
         $login = filter_input(INPUT_POST, 'login', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $mdp = filter_input(INPUT_POST, 'mdp', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $visiteur = $pdo->getInfosVisiteur($login, $mdp);
-        if (!is_array($visiteur)) {
+        if (!is_array($visiteur))
+        {
             Utilitaires::ajouterErreur('Login ou mot de passe incorrect');
             include PATH_VIEWS . 'v_erreurs.php';
             include PATH_VIEWS . 'v_connexion.php';
-        } else {
+        }
+        else
+        {
             $id = $visiteur['id'];
             $nom = $visiteur['nom'];
             $prenom = $visiteur['prenom'];
