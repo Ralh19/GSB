@@ -28,7 +28,7 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        <div class="panel panel-primary">
+        <div class="panel panel-danger">
             <div class="panel-heading">
                 <h3 class="panel-title">
                     <span class="glyphicon glyphicon-bookmark"></span>
@@ -40,12 +40,12 @@
                     <div class="col-xs-12 col-md-12">
                         <a href="index.php?uc=gererFrais&action=saisirFrais"
                            class="btn btn-danger btn-lg" role="button">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                            <br>Renseigner la fiche de frais</a>
+                            <span class="glyphicon glyphicon-ok"></span>
+                            <br>Valider fiche de frais </a>
                         <a href="index.php?uc=etatFrais&action=selectionnerMois"
                            class="btn btn-warning btn-lg" role="button">
-                            <span class="glyphicon glyphicon-list-alt"></span>
-                            <br>Afficher mes fiches de frais</a>
+                            <span class="glyphicon glyphicon-eur"></span>
+                            <br>Suivre le paiement des fiches de frais</a>
                     </div>
                 </div>
             </div>
