@@ -22,6 +22,7 @@ if (!Utilitaires::estConnecteVisiteur()) {
     // Redirection ou erreur si l'utilisateur n'est pas connecté
     Utilitaires::ajouterErreur('Accès non autorisé.');
     header('Location: index.php?uc=connexion');
+    include PATH_VIEWS . 'v_erreurs.php';
     exit();
 }
 

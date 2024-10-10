@@ -26,7 +26,11 @@ session_start();
 $pdo = PdoGsb::getPdoGsb();
 $estConnecte = Utilitaires::estConnecte();
 
-require PATH_VIEWS . 'v_entete.php';
+if ($estConnecte && Utilitaires::estConnecteComptable()) {
+    require PATH_VIEWS . 'v_enteteComptable.php';
+} else {
+    require PATH_VIEWS . 'v_entete.php';
+}
 
 $uc = filter_input(INPUT_GET, 'uc', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
@@ -50,7 +54,7 @@ switch ($uc) {
         break;
     case 'accueilComptable':
         if (Utilitaires::estConnecteComptable()) {
-            include PATH_CTRLS . 'c_accueilComptable.php';
+            include PATH_CTRLS . 'c_accueilcomptable.php';
         } else {
             Utilitaires::ajouterErreur('Accès non autorisé.');
             include PATH_VIEWS . 'v_erreurs.php';
