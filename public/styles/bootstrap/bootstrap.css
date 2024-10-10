@@ -4100,6 +4100,13 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   color: #fff;
   background-color: #337ab7;
 }
+
+.list-group-item.active > .badge,
+.nav-pills2 > .active > a > .badge {
+  color: #337ab7;
+  background-color: #fff;
+}
+
 .nav-pills2 > li {
   float: left;
 }
