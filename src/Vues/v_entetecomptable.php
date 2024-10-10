@@ -43,7 +43,7 @@
                             </h1>
                         </div>
                         <div class="col-md-8">
-                            <ul class="nav nav-pills2 pull-right" role="tablist">
+                            <ul class="nav nav-pills2 pull-right nav-orange" role="tablist">
                                 <li <?php if ($uc == 'accueilcomptable') { ?>class="active" <?php } ?>>
                                     <a href="index.php?uc=accueilComptable">
                                         <span class="glyphicon glyphicon-home"></span>
@@ -52,13 +52,13 @@
                                 </li>
                                 <li <?php if ($uc == 'gererFrais') { ?>class="active"<?php } ?>>
                                     <a href="index.php?uc=gererFrais&action=saisirFrais">
-                                        <span class="glyphicon glyphicon-pencil"></span>
+                                        <span class="glyphicon glyphicon-ok"></span>
                                         Valider la fiche de frais
                                     </a>
                                 </li>
                                 <li <?php if ($uc == 'etatFrais') { ?>class="active"<?php } ?>>
                                     <a href="index.php?uc=etatFrais&action=selectionnerMois">
-                                        <span class="glyphicon glyphicon-list-alt"></span>
+                                        <span class="glyphicon glyphicon-euro"></span>
                                         Suivre le paiement fiches de frais
                                     </a>
                                 </li>
