@@ -14,7 +14,6 @@
  * @version   GIT: <0>
  * @link      http://www.reseaucerta.org Contexte « Laboratoire GSB »
  */
-
 use Outils\Utilitaires;
 
 $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -35,10 +34,17 @@ switch ($action) {
             $id = $utilisateur['id'];
             $nom = $utilisateur['nom'];
             $prenom = $utilisateur['prenom'];
-            $type = isset($utilisateur['type']) ? $utilisateur['type'] : 'visiteur';
-            Utilitaires::connecter($id, $nom, $prenom);
-            header('Location: index.php');
-            exit(); 
+            $type = $utilisateur['type'];
+            Utilitaires::connecter($id, $nom, $prenom, $type);
+            if (Utilitaires::estConnecteVisiteur()) {
+                header('Location: index.php?uc=accueilVisiteur');
+            } elseif (Utilitaires::estConnecteComptable()) {
+                header('Location: index.php?uc=accueilComptable');
+            } else {
+                // Si personne n'est connecté, rediriger vers la page de connexion
+                header('Location: index.php?uc=connexion');
+            }
+            exit();
         } else {
             Utilitaires::ajouterErreur('Login ou mot de passe incorrect');
             include PATH_VIEWS . 'v_erreurs.php';

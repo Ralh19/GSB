@@ -94,7 +94,7 @@ class PdoGsb
 {
     // Vérifier dans la table visiteur
     $requetePrepare = $this->connexion->prepare(
-        'SELECT id, nom, prenom FROM visiteur WHERE login = :unLogin AND mdp = :unMdp'
+        'SELECT id, nom, prenom, "visiteur" AS type FROM visiteur WHERE login = :unLogin AND mdp = :unMdp'
     );
     $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
     $requetePrepare->bindParam(':unMdp', $mdp, PDO::PARAM_STR);
@@ -106,7 +106,7 @@ class PdoGsb
     }
 
     $requetePrepare = $this->connexion->prepare(
-        'SELECT id, nom, prenom FROM comptable WHERE login = :unLogin AND mdp = :unMdp'
+        'SELECT id, nom, prenom, "comptable" AS type FROM comptable WHERE login = :unLogin AND mdp = :unMdp'
     );
     $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
     $requetePrepare->bindParam(':unMdp', $mdp, PDO::PARAM_STR);
