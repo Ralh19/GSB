@@ -41,3 +41,33 @@ footer .container p {
 code {
   font-size: 80%;
 }
+
+.nav-pills2 > li > a {
+    background-color: white; /* Couleur de fond par défaut */
+    color: orange; /* Couleur du texte par défaut */
+}
+
+/* Onglet actif */
+.nav-pills2 > li.active > a {
+    background-color: #f0ad4e; /* Couleur de fond actif */
+    color: white; /* Couleur du texte actif */
+}
+
+/* Effet de survol */
+.nav-pills2 > li > a:hover {
+    background-color: orange; /* Couleur de fond au survol */
+    color: white; /* Couleur du texte au survol */
+}
+
+/* Assurer que l'onglet actif garde sa couleur au survol */
+.nav-pills2 > li.active:hover > a {
+    background-color: #f0ad4e; /* Garde la couleur active au survol */
+    color: white; /* Garde le texte en blanc au survol */
+}
+
+/* Pour le badge dans la liste */
+.list-group-item.active > .badge,
+.nav-pills2 > .active > a > .badge {
+    color: #f0ad4e; /* Couleur badge actif */
+    background-color: #fff; /* Fond badge actif */
+}
