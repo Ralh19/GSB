@@ -45,9 +45,9 @@
                         </h1>
                     </div>
                     <div class="col-md-8">
-                        <ul class="nav nav-pills pull-right" role="tablist">
+                        <ul class="nav nav-pills pull-right nav-orange" role="tablist">
                             <li <?php if (!$uc || $uc == 'accueil') { ?>class="active" <?php } ?>>
-                                <a href="index.php">
+                                <a href="index.php?uc=accueilVisiteur">
                                     <span class="glyphicon glyphicon-home"></span>
                                     Accueil
                                 </a>
