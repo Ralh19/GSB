@@ -39,7 +39,7 @@
                 <div class="row">
                     <div class="col-xs-12 col-md-12">
                         <a href="index.php?uc=gererFrais&action=saisirFrais"
-                           class="btn btn-danger btn-lg" role="button">
+                           class="btn btn-warning btn-lg" role="button">
                             <span class="glyphicon glyphicon-ok"></span>
                             <br>Valider fiche de frais </a>
                         <a href="index.php?uc=etatFrais&action=selectionnerMois"
