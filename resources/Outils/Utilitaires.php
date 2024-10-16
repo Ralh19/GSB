@@ -24,6 +24,10 @@ abstract class Utilitaires {
      *
      * @return vrai ou faux
      */
+    public static function estConnecte() {
+        return isset($_SESSION['idUtilisateur']); // Vérifie si l'utilisateur est connecté
+    }
+
     public static function estConnecteVisiteur() {
         return isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] === 'visiteur';
     }
@@ -47,11 +51,12 @@ abstract class Utilitaires {
      * @return null
      */
     public static function connecter($id, $nom, $prenom, $type) {
-    $_SESSION['idUtilisateur'] = $id;
-    $_SESSION['nom'] = $nom;
-    $_SESSION['prenom'] = $prenom;
-    $_SESSION['typeUtilisateur'] = $type;
-}
+        $_SESSION['idUtilisateur'] = $id;
+        $_SESSION['nom'] = $nom;
+        $_SESSION['prenom'] = $prenom;
+        $_SESSION['typeUtilisateur'] = $type;
+    }
+
     /**
      * Détruit la session active
      *

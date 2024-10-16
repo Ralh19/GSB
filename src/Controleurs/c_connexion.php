@@ -39,7 +39,7 @@ switch ($action) {
             if (Utilitaires::estConnecteVisiteur()) {
                 header('Location: index.php?uc=accueil');
             } elseif (Utilitaires::estConnecteComptable()) {
-                header('Location: index.php?uc=accueilComptable');
+                header('Location: index.php?uc=accueil');
             } else {
                 // Si personne n'est connecté, rediriger vers la page de connexion
                 header('Location: index.php?uc=connexion');
