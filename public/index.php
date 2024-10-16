@@ -40,21 +40,8 @@ switch ($uc) {
     case 'connexion':
         include PATH_CTRLS . 'c_connexion.php';
         break;
-    case 'accueilVisiteur':
-        if (Utilitaires::estConnecteVisiteur()) {
-            include PATH_CTRLS . 'c_accueil.php';
-        } else {
-            Utilitaires::ajouterErreur('Accès non autorisé.');
-            include PATH_VIEWS . 'v_erreurs.php';
-        }
-        break;
-    case 'accueilComptable':
-        if (Utilitaires::estConnecteComptable()) {
-            include PATH_CTRLS . 'c_accueilComptable.php';
-        } else {
-            Utilitaires::ajouterErreur('Accès non autorisé.');
-            include PATH_VIEWS . 'v_erreurs.php';
-        }
+    case 'accueil':
+        include PATH_CTRLS . 'c_accueil.php';
         break;
     case 'gererFrais':
         include PATH_CTRLS . 'c_gererFrais.php';

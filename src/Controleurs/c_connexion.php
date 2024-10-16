@@ -37,7 +37,7 @@ switch ($action) {
             $type = $utilisateur['type'];
             Utilitaires::connecter($id, $nom, $prenom, $type);
             if (Utilitaires::estConnecteVisiteur()) {
-                header('Location: index.php?uc=accueilVisiteur');
+                header('Location: index.php?uc=accueil');
             } elseif (Utilitaires::estConnecteComptable()) {
                 header('Location: index.php?uc=accueilComptable');
             } else {
