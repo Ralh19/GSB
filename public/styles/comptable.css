@@ -42,6 +42,7 @@ code {
   font-size: 80%;
 }
 
+
 .nav-pills2 > li > a {
     background-color: white; /* Couleur de fond par défaut */
     color: orange; /* Couleur du texte par défaut */
@@ -71,3 +72,5 @@ code {
     color: #f0ad4e; /* Couleur badge actif */
     background-color: #fff; /* Fond badge actif */
 }
+
+
