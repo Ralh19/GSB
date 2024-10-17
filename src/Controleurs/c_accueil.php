@@ -14,22 +14,28 @@
  * @version   GIT: <0>
  * @link      http://www.reseaucerta.org Contexte « Laboratoire GSB »
  */
-namespace Outils; // Assurez-vous que le namespace est correct
+use Outils\Utilitaires;
 
-use Outils\Utilitaires; //
-
-if (!Utilitaires::estConnecteVisiteur()) {
-    // Redirection ou erreur si l'utilisateur n'est pas connecté
+if (!Utilitaires::estConnecte()) {
+// Redirection ou erreur si l'utilisateur n'est pas connecté
     Utilitaires::ajouterErreur('Accès non autorisé.');
     header('Location: index.php?uc=connexion');
     include PATH_VIEWS . 'v_erreurs.php';
     exit();
 }
 
-// Récupérer les informations supplémentaires si nécessaire
-$idVisiteur = $_SESSION['idVisiteur']; // Exemple d'ID du visiteur
-// Ici, tu peux ajouter la logique pour récupérer des données spécifiques au visiteur
+// Vérifiez si l'utilisateur est un visiteur ou un comptable
+if (Utilitaires::estConnecteVisiteur()) {
+// Inclure la vue pour l'accueil du visiteur
+    include PATH_VIEWS . 'v_accueilvisiteur.php';
+} elseif (Utilitaires::estConnecteComptable()) {
+// Inclure la vue pour l'accueil du comptable
+    include PATH_VIEWS . 'v_accueilcomptable.php';
+} else {
+// Si le type d'utilisateur n'est pas reconnu
+    Utilitaires::ajouterErreur('Type d\'utilisateur inconnu.');
+    header('Location: index.php?uc=connexion');
+    exit();
+}
 
-// Inclure la vue de l'accueil visiteur
-include PATH_VIEWS . 'v_accueilvisiteur.php'; // Page d'accueil pour les visiteurs
 

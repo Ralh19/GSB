@@ -17,35 +17,40 @@
 use Outils\Utilitaires;
 
 $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-if (!$uc) {
+if (!$uc)
+{
     $uc = 'demandeconnexion';
 }
 
-switch ($action) {
+switch ($action)
+{
     case 'demandeConnexion':
         include PATH_VIEWS . 'v_connexion.php';
         break;
     case 'valideConnexion':
         $login = filter_input(INPUT_POST, 'login', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $mdp = filter_input(INPUT_POST, 'mdp', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $utilisateur = $pdo->getInfosUtilisateur($login, $mdp);
+        $utilisateur = $pdo->getInfosUtilisateur($login);
 
-        if ($utilisateur) {
+        if (password_verify($mdp, $pdo->getMdpUtilisateur($login)))
+        {
             $id = $utilisateur['id'];
             $nom = $utilisateur['nom'];
             $prenom = $utilisateur['prenom'];
             $type = $utilisateur['type'];
             Utilitaires::connecter($id, $nom, $prenom, $type);
             if (Utilitaires::estConnecteVisiteur()) {
-                header('Location: index.php?uc=accueilVisiteur');
+                header('Location: index.php?uc=accueil');
             } elseif (Utilitaires::estConnecteComptable()) {
-                header('Location: index.php?uc=accueilComptable');
+                header('Location: index.php?uc=accueil');
             } else {
                 // Si personne n'est connecté, rediriger vers la page de connexion
                 header('Location: index.php?uc=connexion');
             }
             exit();
-        } else {
+        }
+        else
+        {
             Utilitaires::ajouterErreur('Login ou mot de passe incorrect');
             include PATH_VIEWS . 'v_erreurs.php';
             include PATH_VIEWS . 'v_connexion.php';

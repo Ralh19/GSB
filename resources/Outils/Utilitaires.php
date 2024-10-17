@@ -24,17 +24,21 @@ abstract class Utilitaires {
      *
      * @return vrai ou faux
      */
-    public static function estConnecteVisiteur(): bool {
-        return isset($_SESSION['idVisiteur']) && $_SESSION['typeUtilisateur'] === 'visiteur';
+    public static function estConnecte() {
+        return isset($_SESSION['idUtilisateur']); // Vérifie si l'utilisateur est connecté
     }
 
-    public static function estConnecteComptable(): bool {
-        return isset($_SESSION['idComptable']) && $_SESSION['typeUtilisateur'] === 'comptable';
+    public static function estConnecteVisiteur() {
+        return isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] === 'visiteur';
     }
 
-    public static function estConnecte(): bool
-    {
-        return isset($_SESSION['idVisiteur']) || isset($_SESSION['idComptable']);
+    /**
+     * Vérifie si l'utilisateur connecté est un comptable.
+     *
+     * @return bool True si l'utilisateur est un comptable, false sinon.
+     */
+    public static function estConnecteComptable() {
+        return isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] === 'comptable';
     }
 
     /**
@@ -46,13 +50,8 @@ abstract class Utilitaires {
      *
      * @return null
      */
-    public static function connecter($idUtilisateur, $nom, $prenom, $type): void
-    {
-        if ($type === 'visiteur') {
-            $_SESSION['idVisiteur'] = $idUtilisateur;
-        } elseif ($type === 'comptable') {
-            $_SESSION['idComptable'] = $idUtilisateur;
-        }
+    public static function connecter($id, $nom, $prenom, $type) {
+        $_SESSION['idUtilisateur'] = $id;
         $_SESSION['nom'] = $nom;
         $_SESSION['prenom'] = $prenom;
         $_SESSION['typeUtilisateur'] = $type;
