@@ -12,8 +12,8 @@ require '../config/define.php';
 require '../src/Modeles/PdoGsb.php';
 
 $pdo = PdoGsb::getPdoGsb();
-//$pdo-> hashPassword('visiteur');
-//$pdo-> hashPassword('comptable');
+$pdo-> hashPassword('visiteur');
+$pdo-> hashPassword('comptable');
 
 echo 'Execution effectuer';
 
