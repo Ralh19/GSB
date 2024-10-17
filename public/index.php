@@ -14,7 +14,6 @@
  * @version   GIT: <0>
  * @link      http://www.reseaucerta.org Contexte « Laboratoire GSB »
  */
-
 use Modeles\PdoGsb;
 use Outils\Utilitaires;
 
@@ -26,21 +25,28 @@ session_start();
 $pdo = PdoGsb::getPdoGsb();
 $estConnecte = Utilitaires::estConnecte();
 
-if ($estConnecte && Utilitaires::estConnecteComptable()) {
+if ($estConnecte && Utilitaires::estConnecteComptable())
+{
     require PATH_VIEWS . 'v_enteteComptable.php';
-} else {
+}
+else
+{
     require PATH_VIEWS . 'v_entete.php';
 }
 
 $uc = filter_input(INPUT_GET, 'uc', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-if ($uc && !$estConnecte) {
+if ($uc && !$estConnecte)
+{
     $uc = 'connexion';
-} elseif (empty($uc)) {
+}
+elseif (empty($uc))
+{
     $uc = 'accueil';
 }
 
-switch ($uc) {
+switch ($uc)
+{
     case 'connexion':
         include PATH_CTRLS . 'c_connexion.php';
         break;

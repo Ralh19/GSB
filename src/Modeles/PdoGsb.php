@@ -115,23 +115,8 @@ class PdoGsb {
         return $comptable;
     }
 
-    public function getMdpUtilisateur($login)
+    public function getMdpVisiteur($login)
     {
-
-        $requetePrepare = $this->connexion->prepare(
-                'SELECT mdp '
-                . 'FROM comptable '
-                . 'WHERE comptable.login = :unLogin'
-        );
-        $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
-        $requetePrepare->execute();
-        $comptable = $requetePrepare->fetch(PDO::FETCH_OBJ)->mdp;
-
-        if (isset($comptable))
-        {
-            return $comptable;
-        }
-
         $requetePrepare = $this->connexion->prepare(
                 'SELECT mdp '
                 . 'FROM visiteur '
@@ -139,9 +124,29 @@ class PdoGsb {
         );
         $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
         $requetePrepare->execute();
-        $visiteur = $requetePrepare->fetch(PDO::FETCH_OBJ)->mdp;
-
+        $obj = $requetePrepare->fetch(PDO::FETCH_OBJ);
+        $visiteur = '';
+        if($obj){
+         $visiteur = $obj->mdp;   
+        }
         return $visiteur;
+    }
+
+    public function getMdpComptable($login)
+    {
+        $requetePrepare = $this->connexion->prepare(
+                'SELECT mdp '
+                . 'FROM comptable '
+                . 'WHERE comptable.login = :unLogin'
+        );
+        $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
+        $requetePrepare->execute();
+        $obj = $requetePrepare->fetch(PDO::FETCH_OBJ);
+        $comptable = '';
+        if($obj){
+         $comptable = $obj->mdp;   
+        }
+        return $comptable;
     }
 
     public function hashPassword($tableName)
