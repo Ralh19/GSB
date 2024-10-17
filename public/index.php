@@ -14,7 +14,6 @@
  * @version   GIT: <0>
  * @link      http://www.reseaucerta.org Contexte « Laboratoire GSB »
  */
-
 use Modeles\PdoGsb;
 use Outils\Utilitaires;
 
@@ -26,9 +25,9 @@ session_start();
 $pdo = PdoGsb::getPdoGsb();
 $estConnecte = Utilitaires::estConnecte();
 
-if ($estConnecte && Utilitaires::estConnecteComptable()){
+if ($estConnecte && Utilitaires::estConnecteComptable()) {
     require PATH_VIEWS . "v_enteteComptable.php";
-}else{
+} else {
     require PATH_VIEWS . "v_entete.php";
 }
 

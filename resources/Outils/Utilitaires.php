@@ -55,7 +55,11 @@ abstract class Utilitaires {
         $_SESSION['nom'] = $nom;
         $_SESSION['prenom'] = $prenom;
         $_SESSION['typeUtilisateur'] = $type;
+        
+        if ($type === 'visiteur') {
+        $_SESSION['idVisiteur'] = $id; // Ajoutez cette ligne pour stocker l'idVisiteur
     }
+   }
 
     /**
      * Détruit la session active

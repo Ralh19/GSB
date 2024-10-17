@@ -52,7 +52,7 @@
                                     </a>
                                 </li>
                                 <li <?php if ($uc == 'gererFrais') { ?>class="active"<?php } ?>>
-                                    <a href="index.php?uc=gererFrais&action=saisirFrais">
+                                    <a href="index.php?uc=validerFicheFrais">
                                         <span class="glyphicon glyphicon-pencil"></span>
                                         Valider la fiche de frais
                                     </a>
