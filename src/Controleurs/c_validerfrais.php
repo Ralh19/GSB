@@ -16,6 +16,8 @@ switch ($action) {
         if (isset($_POST['lstVisiteur']) && isset($_POST['lstMois'])) {
             $idVisiteur = filter_input(INPUT_POST, 'lstVisiteur', FILTER_SANITIZE_STRING);
             $mois = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_STRING);
+            
+            $infosFicheFrais = $pdo->getLesInfosFicheFrais($idVisiteur, $mois);
         }
 
 
