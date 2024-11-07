@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Vue État de Frais
  *
@@ -15,7 +14,6 @@
  * @link      http://www.reseaucerta.org Contexte « Laboratoire GSB »
  * @link      https://getbootstrap.com/docs/3.3/ Documentation Bootstrap v3
  */
-
 ?>
 <hr>
 <div class="panel panel-primary">
@@ -32,8 +30,10 @@
     <table class="table table-bordered table-responsive">
         <tr>
             <?php
-            foreach ($lesFraisForfait as $unFraisForfait) {
-                $libelle = $unFraisForfait['libelle']; ?>
+            foreach ($lesFraisForfait as $unFraisForfait)
+            {
+                $libelle = $unFraisForfait['libelle'];
+                ?>
                 <th> <?php echo htmlspecialchars($libelle) ?></th>
                 <?php
             }
@@ -41,8 +41,10 @@
         </tr>
         <tr>
             <?php
-            foreach ($lesFraisForfait as $unFraisForfait) {
-                $quantite = $unFraisForfait['quantite']; ?>
+            foreach ($lesFraisForfait as $unFraisForfait)
+            {
+                $quantite = $unFraisForfait['quantite'];
+                ?>
                 <td class="qteForfait"><?php echo $quantite ?> </td>
                 <?php
             }
@@ -60,10 +62,12 @@
             <th class='montant'>Montant</th>                
         </tr>
         <?php
-        foreach ($lesFraisHorsForfait as $unFraisHorsForfait) {
+        foreach ($lesFraisHorsForfait as $unFraisHorsForfait)
+        {
             $date = $unFraisHorsForfait['date'];
             $libelle = htmlspecialchars($unFraisHorsForfait['libelle']);
-            $montant = $unFraisHorsForfait['montant']; ?>
+            $montant = $unFraisHorsForfait['montant'];
+            ?>
             <tr>
                 <td><?php echo $date ?></td>
                 <td><?php echo $libelle ?></td>
