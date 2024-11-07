@@ -1,34 +1,95 @@
-<h2>Valider fiche de frais</h2>
-<div class="row">
-    <div class="col-md-4">
-        <h3>Sélectionner un visiteur :</h3>
-    </div>
-    <div class="col-md-4">
-        <form action="index.php?uc=validerFrais&action=valider" method="post" role="form">
-            <div class="form-group">
-                <label for="lstVisiteur">Visiteur : </label>
-                <select id="lstVisiteur" name="lstVisiteur" class="form-control">
-                    <?php foreach ($lesVisiteurs as $unVisiteur) : ?>
-                        <option value="<?php echo $unVisiteur['idVisiteur']; ?>">
-                            <?php echo $unVisiteur['nom'] . ' ' . $unVisiteur['prenom']; ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Validation des fiches de frais</title>
+    </head>
+    <body>
 
-            <div class="form-group">
-                <label for="lstMois">Mois : </label>
-                <select id="lstMois" name="lstMois" class="form-control">
-                    <?php foreach ($lesMois as $unMois) : ?>
-                        <option value="<?php echo $unMois['mois']; ?>">
-                            <?php echo substr($unMois['mois'], 4, 2) . '/' . substr($unMois['mois'], 0, 4); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+        <div class="container">
+            <h2>Valider la fiche de frais</h2>
 
-            <input id="ok" type="submit" value="Valider" class="btn btn-success" role="button">
-            <input id="annuler" type="reset" value="Effacer" class="btn btn-danger" role="button">
-        </form>
-    </div>
-</div>
+            <!-- Formulaire pour sélectionner le visiteur et le mois -->
+            <form method="post" action="index.php?uc=validerfrais&action=validerfrais">
+                <div class="form-group">
+                    <label for="lstVisiteur">Choisir le visiteur :</label>
+                    <select name="lstVisiteur" id="lstVisiteur">
+                        <?php foreach ($lesVisiteurs as $visiteur) { ?>
+                            <option value="<?= $visiteur['id'] ?>"><?= htmlspecialchars($visiteur['nom'] . ' ' . $visiteur['prenom']) ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="lstMois">Mois :</label>
+                    <select name="lstMois" id="lstMois">
+                        <?php foreach ($lesMois as $mois) { ?>
+                            <option value="<?= $mois['mois'] ?>"><?= htmlspecialchars($mois['numMois'] . '/' . $mois['numAnnee']) ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-valider">Afficher</button>
+            </form>
+
+            <!-- Section des éléments forfaitisés -->
+            <?php if (isset($lesFraisForfait)) { ?>
+                <h3>Éléments forfaitisés</h3>
+                <table>
+                    <tr>
+                        <th>Libellé</th>
+                        <th>Quantité</th>
+                        <th>Actions</th>
+                    </tr>
+                    <?php foreach ($lesFraisForfait as $frais) { ?>
+                        <tr>
+                            <td><?= htmlspecialchars($frais['libelle']) ?></td>
+                            <td><?= htmlspecialchars($frais['quantite']) ?></td>
+                            <td>
+                                <button class="btn btn-corriger">Corriger</button>
+                                <button class="btn btn-refuser">Refuser</button>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </table>
+            <?php } ?>
+
+            <!-- Section des éléments hors forfait -->
+            <?php if (isset($lesFraisHorsForfait)) { ?>
+                <h3>Descriptif des éléments hors forfait</h3>
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Libellé</th>
+                        <th>Montant</th>
+                        <th>Actions</th>
+                    </tr>
+                    <?php foreach ($lesFraisHorsForfait as $frais) { ?>
+                        <tr>
+                            <td><?= htmlspecialchars($frais['date']) ?></td>
+                            <td><?= htmlspecialchars($frais['libelle']) ?></td>
+                            <td><?= htmlspecialchars($frais['montant']) ?> €</td>
+                            <td>
+                                <button class="btn btn-corriger">Corriger</button>
+                                <button class="btn btn-refuser">Reporter</button>
+                                <button class="btn btn-refuser">Refuser</button>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </table>
+            <?php } ?>
+
+            <!-- Validation finale de la fiche -->
+            <?php if (isset($infosFicheFrais)) { ?>
+                <form method="post" action="index.php?uc=validerfrais&action=validerFiche">
+                    <div class="form-group">
+                        <label for="nbJustificatifs">Nombre de justificatifs :</label>
+                        <input type="text" id="nbJustificatifs" name="nbJustificatifs" value="<?= htmlspecialchars($infosFicheFrais['nbJustificatifs']) ?>">
+                    </div>
+                    <button type="submit" class="btn btn-valider">Valider</button>
+                    <button type="button" class="btn btn-refuser">Refuser</button>
+                </form>
+            <?php } ?>
+        </div>
+
+    </body>
+</html>

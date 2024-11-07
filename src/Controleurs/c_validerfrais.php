@@ -2,18 +2,28 @@
 
 use Outils\Utilitaires;
 
-// Vérifiez si l'utilisateur est connecté
-if (!Utilitaires::estConnecte() || !Utilitaires::estConnecteComptable()) {
-    // Redirigez vers une page d'erreur ou d'authentification
-    header('Location: index.php?uc=connexion');
-    exit;
+$action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+if (!Utilitaires::estConnecteComptable()) {
+    die('Erreur : Accès réservé aux comptables.');
 }
 
-// Récupérez la liste des visiteurs
-$lesVisiteurs = $pdo->getLesVisiteurs(); // Vous devrez avoir une méthode pour récupérer les visiteurs
+switch ($action) {
+    case 'validerfrais':
+        $lesVisiteurs = $pdo->getListeVisiteurs();
+        $lesMois = $pdo->getTousLesMois();
 
-// Récupérez la liste des mois disponibles
-$lesMois = $pdo->getLesMoisDisponiblesPourComptable(); // Adapté pour le comptable
+        if (isset($_POST['lstVisiteur']) && isset($_POST['lstMois'])) {
+            $idVisiteur = filter_input(INPUT_POST, 'lstVisiteur', FILTER_SANITIZE_STRING);
+            $mois = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_STRING);
 
-// Affichez la vue
-include PATH_VIEWS . 'v_valider_fiche_frais.php';
+            $lesFraisForfait = $pdo->getLesFraisForfait($idVisiteur, $mois);
+            $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($idVisiteur, $mois);
+            $infosFicheFrais = $pdo->getLesInfosFicheFrais($idVisiteur, $mois);
+        }
+
+
+        include PATH_VIEWS . 'v_valider_fiche_frais.php';
+        break;
+
+}
