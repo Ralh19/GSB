@@ -30,24 +30,34 @@ switch ($action)
     case 'valideConnexion':
         $login = filter_input(INPUT_POST, 'login', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $mdp = filter_input(INPUT_POST, 'mdp', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $utilisateur = $pdo->getInfosUtilisateur($login, $mdp);
+        $utilisateur = $pdo->getInfosUtilisateur($login);
 
-        if ($utilisateur) {
+        if (password_verify($mdp, $pdo->getMdpVisiteur($login)) || password_verify($mdp, $pdo->getMdpComptable($login)))
+        {
             $id = $utilisateur['id'];
             $nom = $utilisateur['nom'];
             $prenom = $utilisateur['prenom'];
             $type = $utilisateur['type'];
             Utilitaires::connecter($id, $nom, $prenom, $type);
-            if (Utilitaires::estConnecteVisiteur()) {
+            if (Utilitaires::estConnecteVisiteur())
+            {
+                $_SESSION['typeUtilisateur'] = 'visiteur';
                 header('Location: index.php?uc=accueil');
-            } elseif (Utilitaires::estConnecteComptable()) {
+            }
+            elseif (Utilitaires::estConnecteComptable())
+            {
+                $_SESSION['typeUtilisateur'] = 'comptable';
                 header('Location: index.php?uc=accueil');
-            } else {
+            }
+            else
+            {
                 // Si personne n'est connecté, rediriger vers la page de connexion
                 header('Location: index.php?uc=connexion');
             }
             exit();
-        } else {
+        }
+        else
+        {
             Utilitaires::ajouterErreur('Login ou mot de passe incorrect');
             include PATH_VIEWS . 'v_erreurs.php';
             include PATH_VIEWS . 'v_connexion.php';

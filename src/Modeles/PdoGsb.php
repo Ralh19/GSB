@@ -71,8 +71,10 @@ class PdoGsb {
      *
      * @return l'unique objet de la classe PdoGsb
      */
-    public static function getPdoGsb(): PdoGsb {
-        if (self::$instance == null) {
+    public static function getPdoGsb(): PdoGsb
+    {
+        if (self::$instance == null)
+        {
             self::$instance = new PdoGsb();
         }
         return self::$instance;
@@ -86,36 +88,97 @@ class PdoGsb {
      *
      * @return l'id, le nom et le prénom sous la forme d'un tableau associatif
      */
-    public function getInfosUtilisateur($login, $mdp) {
+    public function getInfosUtilisateur($login)
+    {
         // Vérifier dans la table visiteur
         $requetePrepare = $this->connexion->prepare(
-                'SELECT id, nom, prenom, "visiteur" AS type FROM visiteur WHERE login = :unLogin AND mdp = :unMdp'
+                'SELECT id, nom, prenom, "visiteur" AS type FROM visiteur WHERE login = :unLogin'
         );
         $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
-        $requetePrepare->bindParam(':unMdp', $mdp, PDO::PARAM_STR);
         $requetePrepare->execute();
         $visiteur = $requetePrepare->fetch();
 
-        if ($visiteur) {
+        if ($visiteur)
+        {
             return $visiteur;
         }
 
         $requetePrepare = $this->connexion->prepare(
-                'SELECT id, nom, prenom, "comptable" AS type FROM comptable WHERE login = :unLogin AND mdp = :unMdp'
+                'SELECT id, nom, prenom, "comptable" AS type FROM comptable WHERE login = :unLogin'
         );
         $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
-        $requetePrepare->bindParam(':unMdp', $mdp, PDO::PARAM_STR);
         $requetePrepare->execute();
         $comptable = $requetePrepare->fetch();
 
         return $comptable;
     }
 
-    public function getLesVisiteurs() {
-    $req = "SELECT idVisiteur, nom, prenom FROM visiteur ORDER BY nom, prenom";
-    $stmt = $this->pdo->query($req);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+    public function getMdpVisiteur($login)
+    {
+        $requetePrepare = $this->connexion->prepare(
+                'SELECT mdp '
+                . 'FROM visiteur '
+                . 'WHERE visiteur.login = :unLogin'
+        );
+        $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
+        $requetePrepare->execute();
+        $obj = $requetePrepare->fetch(PDO::FETCH_OBJ);
+        $visiteur = '';
+        if($obj){
+         $visiteur = $obj->mdp;   
+        }
+        return $visiteur;
+    }
+
+    public function getMdpComptable($login)
+    {
+        $requetePrepare = $this->connexion->prepare(
+                'SELECT mdp '
+                . 'FROM comptable '
+                . 'WHERE comptable.login = :unLogin'
+        );
+        $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
+        $requetePrepare->execute();
+        $obj = $requetePrepare->fetch(PDO::FETCH_OBJ);
+        $comptable = '';
+        if($obj){
+         $comptable = $obj->mdp;   
+        }
+        return $comptable;
+    }
+
+    public function hashPassword($tableName)
+    {
+        $allowedTables = ['visiteur', 'comptable'];
+
+        // Vérifier si le nom de table est autorisé pour éviter toute injection SQL
+        if (!in_array($tableName, $allowedTables))
+        {
+            throw new Exception("Nom de table invalide.");
+        }
+
+        // Préparation de la requête pour sélectionner les mots de passe et les IDs dans la table spécifiée
+        $requetePrepare = $this->connexion->prepare(
+                "SELECT mdp, id FROM $tableName"
+        );
+        $requetePrepare->execute();
+        $lignes = $requetePrepare->fetchAll(PDO::FETCH_ASSOC);
+
+        // Parcours de chaque ligne pour hacher le mot de passe
+        foreach ($lignes as $array)
+        {
+            $mdp = $array["mdp"];
+            $id = $array["id"];
+            $hashMdp = password_hash($mdp, PASSWORD_DEFAULT);
+
+            // Mise à jour du mot de passe haché dans la table
+            $req = $this->connexion->prepare("UPDATE $tableName SET mdp = :hashMdp WHERE id = :unId");
+            $req->bindParam(':unId', $id, PDO::PARAM_STR);
+            $req->bindParam(':hashMdp', $hashMdp, PDO::PARAM_STR);
+            $req->execute();
+        }
+        echo "Tous les mots de passe de la table $tableName ont été hachés avec succès.";
+    }
 
     public function getMoisDisponibles() {
         $req = "SELECT DISTINCT mois, annee FROM fichefrais ORDER BY annee DESC, mois DESC";
@@ -148,7 +211,8 @@ class PdoGsb {
         $requetePrepare->execute();
         $lesLignes = $requetePrepare->fetchAll();
         $nbLignes = count($lesLignes);
-        for ($i = 0; $i < $nbLignes; $i++) {
+        for ($i = 0; $i < $nbLignes; $i++)
+        {
             $date = $lesLignes[$i]['date'];
             $lesLignes[$i]['date'] = Utilitaires::dateAnglaisVersFrancais($date);
         }
@@ -240,7 +304,8 @@ class PdoGsb {
      */
     public function majFraisForfait($idVisiteur, $mois, $lesFrais): void {
         $lesCles = array_keys($lesFrais);
-        foreach ($lesCles as $unIdFrais) {
+        foreach ($lesCles as $unIdFrais)
+        {
             $qte = $lesFrais[$unIdFrais];
             $requetePrepare = $this->connexion->prepare(
                     'UPDATE lignefraisforfait '
@@ -302,7 +367,8 @@ class PdoGsb {
         $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
         $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
         $requetePrepare->execute();
-        if (!$requetePrepare->fetch()) {
+        if (!$requetePrepare->fetch())
+        {
             $boolReturn = true;
         }
         return $boolReturn;
@@ -344,7 +410,8 @@ class PdoGsb {
     public function creeNouvellesLignesFrais($idVisiteur, $mois): void {
         $dernierMois = $this->dernierMoisSaisi($idVisiteur);
         $laDerniereFiche = $this->getLesInfosFicheFrais($idVisiteur, $dernierMois);
-        if ($laDerniereFiche['idEtat'] == 'CR') {
+        if ($laDerniereFiche['idEtat'] == 'CR')
+        {
             $this->majEtatFicheFrais($idVisiteur, $dernierMois, 'CL');
         }
         $requetePrepare = $this->connexion->prepare(
@@ -356,7 +423,8 @@ class PdoGsb {
         $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
         $requetePrepare->execute();
         $lesIdFrais = $this->getLesIdFrais();
-        foreach ($lesIdFrais as $unIdFrais) {
+        foreach ($lesIdFrais as $unIdFrais)
+        {
             $requetePrepare = $this->connexion->prepare(
                     'INSERT INTO lignefraisforfait (idvisiteur,mois,'
                     . 'idfraisforfait,quantite) '
@@ -429,7 +497,8 @@ class PdoGsb {
         $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
         $requetePrepare->execute();
         $lesMois = array();
-        while ($laLigne = $requetePrepare->fetch()) {
+        while ($laLigne = $requetePrepare->fetch())
+        {
             $mois = $laLigne['mois'];
             $numAnnee = substr($mois, 0, 4);
             $numMois = substr($mois, 4, 2);

@@ -32,7 +32,8 @@
         <div class="container">
             <?php
             $uc = filter_input(INPUT_GET, 'uc', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            if ($estConnecte) {
+            if ($estConnecte)
+            {
                 ?>
                 <div class="header">
                     <div class="row vertical-align">
@@ -57,14 +58,16 @@
                                         Valider la fiche de frais
                                     </a>
                                 </li>
-                                <li <?php if ($uc == 'etatFrais') { ?>class="active"<?php } ?>>
+                                <li <?php if ($uc == 'etatFrais')
+                { ?>class="active"<?php } ?>>
                                     <a href="index.php?uc=etatFrais&action=selectionnerMois">
                                         <span class="glyphicon glyphicon-list-alt"></span>
                                         Suivre les fiches de frais
                                     </a>
                                 </li>
                                 <li 
-                                    <?php if ($uc == 'deconnexion') { ?>class="active"<?php } ?>>
+    <?php if ($uc == 'deconnexion')
+    { ?>class="active"<?php } ?>>
                                     <a href="index.php?uc=deconnexion&action=demandeDeconnexion">
                                         <span class="glyphicon glyphicon-log-out"></span>
                                         Déconnexion
@@ -74,14 +77,16 @@
                         </div>
                     </div>
                 </div>
-                <?php
-            } else {
-                ?>   
+    <?php
+}
+else
+{
+    ?>   
                 <h1>
                     <img src="./images/logo.jpg"
                          class="img-responsive center-block"
                          alt="Laboratoire Galaxy-Swiss Bourdin"
                          title="Laboratoire Galaxy-Swiss Bourdin">
                 </h1>
-                <?php
-            }
+    <?php
+}
