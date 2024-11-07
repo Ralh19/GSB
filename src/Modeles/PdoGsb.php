@@ -112,18 +112,30 @@ class PdoGsb {
     }
 
     public function getLesVisiteurs() {
-    $req = "SELECT idVisiteur, nom, prenom FROM visiteur ORDER BY nom, prenom";
-    $stmt = $this->pdo->query($req);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-    public function getMoisDisponibles() {
-        $req = "SELECT DISTINCT mois, annee FROM fichefrais ORDER BY annee DESC, mois DESC";
+        $req = 'SELECT id, nom, prenom FROM visiteur';
         $stmt = $this->connexion->prepare($req);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getMoisDisponibles(): array {
+        $req = "SELECT DISTINCT mois FROM fichefrais ORDER BY mois DESC";
+        $stmt = $this->connexion->prepare($req);
+        $stmt->execute();
+
+        $lesMois = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $mois = $row['mois'];
+            $numAnnee = substr($mois, 0, 4); // Extraire l'année
+            $numMois = substr($mois, 4, 2);   // Extraire le mois
+            $lesMois[] = [
+                'mois' => $mois,
+                'numAnnee' => $numAnnee,
+                'numMois' => $numMois
+            ];
+        }
+        return $lesMois;
+    }
 
     /**
      * Retourne sous forme d'un tableau associatif toutes les lignes de frais

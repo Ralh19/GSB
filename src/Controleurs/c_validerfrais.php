@@ -9,17 +9,13 @@ if (!Utilitaires::estConnecteComptable()) {
 }
 
 switch ($action) {
-    case 'validerfrais':
-        $lesVisiteurs = $pdo->getListeVisiteurs();
-        $lesMois = $pdo->getTousLesMois();
+    case 'validerFrais':
+        $lesVisiteurs = $pdo->getLesVisiteurs();
+        $lesMois = $pdo->getMoisDisponibles();
 
         if (isset($_POST['lstVisiteur']) && isset($_POST['lstMois'])) {
             $idVisiteur = filter_input(INPUT_POST, 'lstVisiteur', FILTER_SANITIZE_STRING);
             $mois = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_STRING);
-
-            $lesFraisForfait = $pdo->getLesFraisForfait($idVisiteur, $mois);
-            $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($idVisiteur, $mois);
-            $infosFicheFrais = $pdo->getLesInfosFicheFrais($idVisiteur, $mois);
         }
 
 
