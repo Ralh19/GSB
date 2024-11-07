@@ -51,8 +51,8 @@
                                         Accueil
                                     </a>
                                 </li>
-                                <li <?php if ($uc == 'gererFrais') { ?>class="active"<?php } ?>>
-                                    <a href="index.php?uc=validerfrais">
+                                <li <?php if ($uc == 'validerfrais') { ?>class="active"<?php } ?>>
+                                    <a href="index.php?uc=validerfrais&action=validerFrais">
                                         <span class="glyphicon glyphicon-pencil"></span>
                                         Valider la fiche de frais
                                     </a>
