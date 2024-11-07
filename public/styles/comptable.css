@@ -1,0 +1,66 @@
+
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: 60px; /* Margin bottom by footer height */
+}
+.header {
+    margin-top: 10px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px; /* Set the fixed height of the footer here */
+  background-color: #f5f5f5;
+}
+body > .container {
+  padding: 60px 15px 25px;
+}
+.container .text-muted {
+  margin: 20px 0;
+}
+.footer > .container {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+footer .container p {
+	text-align: center;
+	color: #337ab7;
+}
+code {
+  font-size: 80%;
+}
+
+.nav-pills2 > li > a {
+    background-color: white; /* Couleur de fond par défaut */
+    color: orange; /* Couleur du texte par défaut */
+}
+
+/* Onglet actif */
+.nav-pills2 > li.active > a {
+    background-color: #f0ad4e; /* Couleur de fond actif */
+    color: white; /* Couleur du texte actif */
+}
+
+/* Effet de survol */
+.nav-pills2 > li > a:hover {
+    background-color: orange; /* Couleur de fond au survol */
+    color: white; /* Couleur du texte au survol */
+}
+
+/* Assurer que l'onglet actif garde sa couleur au survol */
+.nav-pills2 > li.active:hover > a {
+    background-color: #f0ad4e; /* Garde la couleur active au survol */
+    color: white; /* Garde le texte en blanc au survol */
+}
+
+/* Pour le badge dans la liste */
+.list-group-item.active > .badge,
+.nav-pills2 > .active > a > .badge {
+    color: #f0ad4e; /* Couleur badge actif */
+    background-color: #fff; /* Fond badge actif */
+}

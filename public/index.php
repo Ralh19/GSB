@@ -25,7 +25,11 @@ session_start();
 $pdo = PdoGsb::getPdoGsb();
 $estConnecte = Utilitaires::estConnecte();
 
-require PATH_VIEWS . 'v_entete.php';
+if ($estConnecte && Utilitaires::estConnecteComptable()) {
+    require PATH_VIEWS . "v_enteteComptable.php";
+} else {
+    require PATH_VIEWS . "v_entete.php";
+}
 
 $uc = filter_input(INPUT_GET, 'uc', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
@@ -51,6 +55,9 @@ switch ($uc)
         break;
     case 'etatFrais':
         include PATH_CTRLS . 'c_etatFrais.php';
+        break;
+    case 'validerfrais': // Nouveau cas pour valider les fiches de frais
+        include PATH_CTRLS . 'c_validerFrais.php';
         break;
     case 'deconnexion':
         include PATH_CTRLS . 'c_deconnexion.php';

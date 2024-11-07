@@ -17,16 +17,28 @@
 
 namespace Outils;
 
-abstract class Utilitaires
-{
+abstract class Utilitaires {
+
     /**
      * Teste si un quelconque visiteur est connecté
      *
      * @return vrai ou faux
      */
-    public static function estConnecte(): bool
-    {
-        return isset($_SESSION['idVisiteur']);
+    public static function estConnecte() {
+        return isset($_SESSION['idUtilisateur']); // Vérifie si l'utilisateur est connecté
+    }
+
+    public static function estConnecteVisiteur() {
+        return isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] === 'visiteur';
+    }
+
+    /**
+     * Vérifie si l'utilisateur connecté est un comptable.
+     *
+     * @return bool True si l'utilisateur est un comptable, false sinon.
+     */
+    public static function estConnecteComptable() {
+        return isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] === 'comptable';
     }
 
     /**
@@ -38,20 +50,23 @@ abstract class Utilitaires
      *
      * @return null
      */
-    public static function connecter($idVisiteur, $nom, $prenom): void
-    {
-        $_SESSION['idVisiteur'] = $idVisiteur;
+    public static function connecter($id, $nom, $prenom, $type) {
+        $_SESSION['idUtilisateur'] = $id;
         $_SESSION['nom'] = $nom;
         $_SESSION['prenom'] = $prenom;
+        $_SESSION['typeUtilisateur'] = $type;
+        
+        if ($type === 'visiteur') {
+        $_SESSION['idVisiteur'] = $id; // Ajoutez cette ligne pour stocker l'idVisiteur
     }
+   }
 
     /**
      * Détruit la session active
      *
      * @return null
      */
-    public static function deconnecter(): void
-    {
+    public static function deconnecter(): void {
         session_destroy();
     }
 
@@ -63,8 +78,7 @@ abstract class Utilitaires
      *
      * @return Date au format anglais aaaa-mm-jj
      */
-    public static function dateFrancaisVersAnglais($maDate): string
-    {
+    public static function dateFrancaisVersAnglais($maDate): string {
         @list($jour, $mois, $annee) = explode('/', $maDate);
         return date('Y-m-d', mktime(0, 0, 0, $mois, $jour, $annee));
     }
@@ -77,8 +91,7 @@ abstract class Utilitaires
      *
      * @return Date au format format français jj/mm/aaaa
      */
-    public static function dateAnglaisVersFrancais($maDate): string
-    {
+    public static function dateAnglaisVersFrancais($maDate): string {
         @list($annee, $mois, $jour) = explode('-', $maDate);
         $date = $jour . '/' . $mois . '/' . $annee;
         return $date;
@@ -91,8 +104,7 @@ abstract class Utilitaires
      *
      * @return String Mois au format aaaamm
      */
-    public static function getMois($date): string
-    {
+    public static function getMois($date): string {
         @list($jour, $mois, $annee) = explode('/', $date);
         unset($jour);
         if (strlen($mois) == 1) {
@@ -110,8 +122,7 @@ abstract class Utilitaires
      *
      * @return Boolean vrai ou faux
      */
-    public static function estEntierPositif($valeur): bool
-    {
+    public static function estEntierPositif($valeur): bool {
         return preg_match('/[^0-9]/', $valeur) == 0;
     }
 
@@ -122,8 +133,7 @@ abstract class Utilitaires
      *
      * @return Boolean vrai ou faux
      */
-    public static function estTableauEntiers($tabEntiers): bool
-    {
+    public static function estTableauEntiers($tabEntiers): bool {
         $boolReturn = true;
         foreach ($tabEntiers as $unEntier) {
             if (!self::estEntierPositif($unEntier)) {
@@ -140,8 +150,7 @@ abstract class Utilitaires
      *
      * @return Boolean vrai ou faux
      */
-    public static function estDateDepassee($dateTestee): bool
-    {
+    public static function estDateDepassee($dateTestee): bool {
         $dateActuelle = date('d/m/Y');
         @list($jour, $mois, $annee) = explode('/', $dateActuelle);
         $annee--;
@@ -157,8 +166,7 @@ abstract class Utilitaires
      *
      * @return Boolean vrai ou faux
      */
-    public static function estDateValide($date): bool
-    {
+    public static function estDateValide($date): bool {
         $tabDate = explode('/', $date);
         $dateOK = true;
         if (count($tabDate) != 3) {
@@ -182,8 +190,7 @@ abstract class Utilitaires
      *
      * @return Boolean vrai ou faux
      */
-    public static function lesQteFraisValides($lesFrais): bool
-    {
+    public static function lesQteFraisValides($lesFrais): bool {
         return self::estTableauEntiers($lesFrais);
     }
 
@@ -199,8 +206,7 @@ abstract class Utilitaires
      *
      * @return null
      */
-    public static function valideInfosFrais($dateFrais, $libelle, $montant): void
-    {
+    public static function valideInfosFrais($dateFrais, $libelle, $montant): void {
         if ($dateFrais == '') {
             self::ajouterErreur('Le champ date ne doit pas être vide');
         } else {
@@ -229,8 +235,7 @@ abstract class Utilitaires
      *
      * @return null
      */
-    public static function ajouterErreur($msg): void
-    {
+    public static function ajouterErreur($msg): void {
         if (!isset($_REQUEST['erreurs'])) {
             $_REQUEST['erreurs'] = array();
         }
@@ -242,8 +247,7 @@ abstract class Utilitaires
      *
      * @return Integer le nombre d'erreurs
      */
-    public static function nbErreurs(): int
-    {
+    public static function nbErreurs(): int {
         if (!isset($_REQUEST['erreurs'])) {
             return 0;
         } else {
