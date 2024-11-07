@@ -119,7 +119,20 @@ class PdoGsb {
     }
 
     public function getMoisDisponibles(): array {
-        $req = "SELECT DISTINCT mois FROM fichefrais ORDER BY mois DESC";
+        $req = "
+        SELECT DISTINCT 
+            fichefrais.mois 
+        FROM 
+            fichefrais 
+        INNER JOIN 
+            etat ON fichefrais.idetat = etat.id 
+        WHERE 
+            etat.id IN ('CR', 'CL') 
+        GROUP BY 
+            fichefrais.idvisiteur, fichefrais.mois 
+        ORDER BY 
+            fichefrais.mois DESC
+    ";
         $stmt = $this->connexion->prepare($req);
         $stmt->execute();
 
@@ -466,7 +479,7 @@ class PdoGsb {
      */
     public function getLesInfosFicheFrais($idVisiteur, $mois): array {
         $requetePrepare = $this->connexion->prepare(
-                'SELECT fichefrais.idetat as idEtat, '
+                'SELECT fichefrais.idetat as idetat, '
                 . 'fichefrais.datemodif as dateModif,'
                 . 'fichefrais.nbjustificatifs as nbJustificatifs, '
                 . 'fichefrais.montantvalide as montantValide, '

@@ -1,115 +1,127 @@
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px; /* Margin bottom by footer height */
+    margin-bottom: 60px; /* Margin bottom by footer height */
 }
 
 .header {
-  margin-top: 10px;
+    margin-top: 10px;
 }
 
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 60px; /* Set the fixed height of the footer here */
-  background-color: #f5f5f5;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px; /* Set the fixed height of the footer here */
+    background-color: #f5f5f5;
 }
 
 body > .container {
-  padding: 60px 15px 25px;
+    padding: 60px 15px 25px;
 }
 
 .container .text-muted {
-  margin: 20px 0;
+    margin: 20px 0;
 }
 
 .footer > .container {
-  padding-right: 15px;
-  padding-left: 15px;
+    padding-right: 15px;
+    padding-left: 15px;
 }
 
 footer .container p {
-  text-align: center;
-  color: #337ab7;
+    text-align: center;
+    color: #337ab7;
 }
 
 code {
-  font-size: 80%;
+    font-size: 80%;
 }
 
 .nav-pills2 > li > a {
-  background-color: white; /* Couleur de fond par défaut */
-  color: orange; /* Couleur du texte par défaut */
+    background-color: white; /* Couleur de fond par défaut */
+    color: orange; /* Couleur du texte par défaut */
 }
 
 /* Onglet actif */
 .nav-pills2 > li.active > a {
-  background-color: #f0ad4e; /* Couleur de fond actif */
-  color: white; /* Couleur du texte actif */
+    background-color: #f0ad4e; /* Couleur de fond actif */
+    color: white; /* Couleur du texte actif */
 }
 
 /* Effet de survol */
 .nav-pills2 > li > a:hover {
-  background-color: orange; /* Couleur de fond au survol */
-  color: white; /* Couleur du texte au survol */
+    background-color: orange; /* Couleur de fond au survol */
+    color: white; /* Couleur du texte au survol */
 }
 
 /* Assurer que l'onglet actif garde sa couleur au survol */
 .nav-pills2 > li.active:hover > a {
-  background-color: #f0ad4e; /* Garde la couleur active au survol */
-  color: white; /* Garde le texte en blanc au survol */
+    background-color: #f0ad4e; /* Garde la couleur active au survol */
+    color: white; /* Garde le texte en blanc au survol */
 }
 
 /* Pour le badge dans la liste */
 .list-group-item.active > .badge,
 .nav-pills2 > .active > a > .badge {
-  color: #f0ad4e; /* Couleur badge actif */
-  background-color: #fff; /* Fond badge actif */
+    color: #f0ad4e; /* Couleur badge actif */
+    background-color: #fff; /* Fond badge actif */
 }
 
 /* Styles pour le formulaire */
 .form-group {
-  margin-bottom: 10px; /* Ajoute de l'espace entre les éléments du formulaire */
-  margin-left: 15px;
+    margin-bottom: 10px; /* Ajoute de l'espace entre les éléments du formulaire */
+    margin-left: 15px;
 }
 
 .btn-primary {
-  background-color: #FF5722; /* Couleur orange pour le bouton */
-  border: none;
+    background-color: #FF5722; /* Couleur orange pour le bouton */
+    border: none;
 }
 
 .btn-primary:hover {
-  background-color: #E64A19; /* Couleur foncée au survol */
+    background-color: #E64A19; /* Couleur foncée au survol */
 }
 
 /* Texte descriptif */
 .container p {
-  margin-top: 20px; /* Espace au-dessus du texte descriptif */
-  color: #555; /* Couleur de texte */
-  font-size: 16px; /* Taille de texte */
+    margin-top: 20px; /* Espace au-dessus du texte descriptif */
+    color: #555; /* Couleur de texte */
+    font-size: 16px; /* Taille de texte */
 }
 
 
 .choixVisiteurMois form {
     display: flex;
-    
+
 }
 
 h2{
     color : orange;
 }
 
-/* Limiter la largeur de l'input associé au datalist */
-input[list] {
-    width: 200px; /* Définissez une largeur fixe que vous souhaitez */
-    padding: 5px; /* Ajouter un peu de rembourrage pour l'esthétique */
+
+.elements-forfaitises{
+    display : flex;
+    flex-direction: column;
+    width: 130px;
+    margin-left: 15px;
 }
 
-/* Optionnel : pour styliser la liste déroulante, mais limité par la largeur de l'input */
-datalist {
-    max-width: 200px; /* Limiter la largeur de la datalist */
+.elements-forfaitises input {
+    margin-bottom: 10px;
 }
+
+.btn-corriger{
+    background-color : green;
+    color: white;
+}
+
+.btn-rembourser{
+    background-color : red;
+    color : white;
+}
+
