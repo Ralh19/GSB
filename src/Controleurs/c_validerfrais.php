@@ -15,12 +15,23 @@ switch ($action) {
         $lesMois = [];
         $infosFicheFrais = [];
         $moisASelectionner = ''; // Initialiser la variable du mois sélectionné
+        $infosVisiteur = []; // Initialiser infosVisiteur comme un tableau vide
         // Si un visiteur a été sélectionné
         if (isset($_POST['lstVisiteur'])) {
             $idVisiteur = filter_input(INPUT_POST, 'lstVisiteur', FILTER_SANITIZE_STRING);
+
+            // Sauvegarder l'ID du visiteur dans la session
+            $_SESSION['idVisiteur'] = $idVisiteur;
+
             // Récupérer les mois associés à ce visiteur où l'état est CR ou CL
             $lesMois = $pdo->getLesMoisDisponibles($idVisiteur);
-            $_SESSION['idVisiteur'] = $idVisiteur; // Sauvegarder l'ID du visiteur dans la session
+
+            // Récupérer les informations du visiteur pour l'affichage
+            $infosVisiteur = $pdo->getVisiteurInfo($idVisiteur);
+
+            // Enregistrer le nom et le prénom du visiteur dans la session
+            $_SESSION['nomVisiteur'] = $infosVisiteur['nom'];
+            $_SESSION['prenomVisiteur'] = $infosVisiteur['prenom'];
         }
 
         // Si un mois a été sélectionné
