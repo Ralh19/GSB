@@ -103,25 +103,37 @@ h2{
     color : orange;
 }
 
+/* Limiter la largeur de l'input associé au datalist */
+input[list] {
+    width: 200px; /* Définissez une largeur fixe que vous souhaitez */
+    padding: 5px; /* Ajouter un peu de rembourrage pour l'esthétique */
+}
 
-.elements-forfaitises{
-    display : flex;
+/* Optionnel : pour styliser la liste déroulante, mais limité par la largeur de l'input */
+datalist {
+    max-width: 200px; /* Limiter la largeur de la datalist */
+}
+
+.form-col{
+    display: flex;
     flex-direction: column;
-    width: 130px;
-    margin-left: 15px;
+    width: 20%;
+    margin-bottom: 1px;
 }
 
-.elements-forfaitises input {
-    margin-bottom: 10px;
+.btn-group{
+    margin-top: 15px;
+    display: flex;
+    gap: 15px;
+
 }
 
-.btn-corriger{
-    background-color : green;
+#btn-corriger{
+    background-color: green;
+    color: white;
+
+}
+#btn-rembourser{
+    background-color: red;
     color: white;
 }
-
-.btn-rembourser{
-    background-color : red;
-    color : white;
-}
-
