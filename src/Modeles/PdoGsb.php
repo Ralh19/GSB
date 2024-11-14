@@ -489,6 +489,18 @@ class PdoGsb {
         return $lesMois;
     }
 
+    public function getVisiteurInfo($idVisiteur) {
+        $req = "SELECT nom, prenom FROM visiteur WHERE id = :idVisiteur";
+        $stmt = $this->connexion->prepare($req);
+        $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $stmt->execute();
+
+        // Récupérer les informations du visiteur
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result;
+    }
+
     /**
      * Retourne les informations d'une fiche de frais d'un visiteur pour un
      * mois donné

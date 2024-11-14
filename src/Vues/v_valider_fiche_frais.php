@@ -51,8 +51,23 @@
                     <label for="fraisKilometrique">Frais Kilométrique:</label>
                     <input type="number" id="fraisKilometrique" name="fraisKilometrique" value="<?= $infosFicheFrais['fraisKilometrique'] ?? '' ?>" readonly>
 
+<<<<<<< HEAD
                     <label for="nuiteeHotel">Nuitée Hôtel:</label>
                     <input type="number" id="nuiteeHotel" name="nuiteeHotel" value="<?= $infosFicheFrais['nuiteeHotel'] ?? '' ?>" readonly>
+=======
+            <!-- Affichage du titre et des éléments forfaitisés -->
+            <?php if (isset($infosFicheFrais) && !empty($infosFicheFrais)): ?>
+                <div class="elements-forfaitises">
+                    <h3>
+                        <!-- Vérifie si les informations du visiteur sont présentes dans la session -->
+                        Éléments forfaitisés de 
+                        <?= isset($_SESSION['nomVisiteur']) && isset($_SESSION['prenomVisiteur']) ? htmlspecialchars($_SESSION['nomVisiteur'] . ' ' . $_SESSION['prenomVisiteur']) : 'Visiteur inconnu' ?>
+                        pour le mois <?= substr($moisASelectionner, 4, 2) . '/' . substr($moisASelectionner, 0, 4); ?>
+                    </h3>
+                    <div class="form-col">
+                        <label for="forfaitEtape">Forfait Étape:</label>
+                        <input type="number" id="forfaitEtape" name="forfaitEtape" value="<?= $infosFicheFrais['forfaitEtape'] ?? '' ?>" readonly>
+>>>>>>> 9ba10ab (vivienne a disparu passons au élément forfaitisé)
 
                     <label for="repasRestaurant">Repas Restaurant:</label>
                     <input type="number" id="repasRestaurant" name="repasRestaurant" value="<?= $infosFicheFrais['repasRestaurant'] ?? '' ?>" readonly>
@@ -65,5 +80,6 @@
                 </div>
             </div>
         </div>
+
     </body>
 </html>
