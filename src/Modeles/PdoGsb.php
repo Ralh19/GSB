@@ -111,32 +111,41 @@ class PdoGsb {
         return $comptable;
     }
 
-    public function getLesVisiteurs() {
-        $req = 'SELECT id, nom, prenom FROM visiteur';
+    public function getLesVisiteurs(): array {
+        $req = "SELECT id, nom, prenom FROM visiteur"; // Remplace par la bonne requête SQL pour récupérer les visiteurs
         $stmt = $this->connexion->prepare($req);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $lesVisiteurs = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $lesVisiteurs[] = $row;
+        }
+
+        return $lesVisiteurs;
     }
 
-    public function getMoisDisponibles(): array {
+    public function getMoisDisponibles($idVisiteur): array {
+        // Debug : Afficher l'ID du visiteur passé à la méthode
+        var_dump($idVisiteur); // Vérifie si l'ID du visiteur est bien passé à la méthode
+        // Requête SQL pour récupérer les mois
         $req = "
-        SELECT DISTINCT 
-            fichefrais.mois 
-        FROM 
-            fichefrais 
-        INNER JOIN 
-            etat ON fichefrais.idetat = etat.id 
-        WHERE 
-            etat.id IN ('CR', 'CL') 
-        GROUP BY 
-            fichefrais.idvisiteur, fichefrais.mois 
-        ORDER BY 
-            fichefrais.mois DESC
+    SELECT fichefrais.mois
+    FROM fichefrais
+    INNER JOIN visiteur ON fichefrais.idvisiteur = visiteur.id
+    WHERE fichefrais.idetat IN ('CR', 'CL')
+    AND fichefrais.idvisiteur = :idVisiteur
+    ORDER BY fichefrais.mois DESC
     ";
+
+        // Préparer et exécuter la requête
         $stmt = $this->connexion->prepare($req);
+        $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
         $stmt->execute();
 
+        // Initialisation du tableau pour les mois
         $lesMois = [];
+
+        // Récupérer les résultats
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $mois = $row['mois'];
             $numAnnee = substr($mois, 0, 4); // Extraire l'année
@@ -147,6 +156,7 @@ class PdoGsb {
                 'numMois' => $numMois
             ];
         }
+
         return $lesMois;
     }
 
@@ -173,7 +183,9 @@ class PdoGsb {
         $requetePrepare->execute();
         $lesLignes = $requetePrepare->fetchAll();
         $nbLignes = count($lesLignes);
-        for ($i = 0; $i < $nbLignes; $i++) {
+        for ($i = 0;
+                $i < $nbLignes;
+                $i++) {
             $date = $lesLignes[$i]['date'];
             $lesLignes[$i]['date'] = Utilitaires::dateAnglaisVersFrancais($date);
         }
@@ -446,24 +458,34 @@ class PdoGsb {
      *         l'année et le mois correspondant
      */
     public function getLesMoisDisponibles($idVisiteur): array {
+        // Préparation de la requête SQL
         $requetePrepare = $this->connexion->prepare(
                 'SELECT fichefrais.mois AS mois FROM fichefrais '
                 . 'WHERE fichefrais.idvisiteur = :unIdVisiteur '
-                . 'ORDER BY fichefrais.mois desc'
+                . 'ORDER BY fichefrais.mois DESC'
         );
+
+        // Lier le paramètre pour l'ID du visiteur
         $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
         $requetePrepare->execute();
+
+        // Initialisation d'un tableau pour stocker les mois
         $lesMois = array();
+
+        // Récupérer les résultats
         while ($laLigne = $requetePrepare->fetch()) {
             $mois = $laLigne['mois'];
-            $numAnnee = substr($mois, 0, 4);
-            $numMois = substr($mois, 4, 2);
+            $numAnnee = substr($mois, 0, 4); // Extraire l'année
+            $numMois = substr($mois, 4, 2);  // Extraire le mois
+            // Ajouter les mois au tableau
             $lesMois[] = array(
                 'mois' => $mois,
                 'numAnnee' => $numAnnee,
                 'numMois' => $numMois
             );
         }
+
+        // Retourner le tableau des mois
         return $lesMois;
     }
 
