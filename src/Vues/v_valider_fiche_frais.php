@@ -56,7 +56,12 @@
             <!-- Affichage du titre et des éléments forfaitisés -->
             <?php if (isset($infosFicheFrais) && !empty($infosFicheFrais)): ?>
                 <div class="elements-forfaitises">
-                    <h3>Éléments forfaitisés de <?= htmlspecialchars($visiteur['nom'] . ' ' . $visiteur['prenom']) ?> pour le mois <?= substr($moisASelectionner, 4, 2) . '/' . substr($moisASelectionner, 0, 4); ?></h3>
+                    <h3>
+                        <!-- Vérifie si les informations du visiteur sont présentes dans la session -->
+                        Éléments forfaitisés de 
+                        <?= isset($_SESSION['nomVisiteur']) && isset($_SESSION['prenomVisiteur']) ? htmlspecialchars($_SESSION['nomVisiteur'] . ' ' . $_SESSION['prenomVisiteur']) : 'Visiteur inconnu' ?>
+                        pour le mois <?= substr($moisASelectionner, 4, 2) . '/' . substr($moisASelectionner, 0, 4); ?>
+                    </h3>
                     <div class="form-col">
                         <label for="forfaitEtape">Forfait Étape:</label>
                         <input type="number" id="forfaitEtape" name="forfaitEtape" value="<?= $infosFicheFrais['forfaitEtape'] ?? '' ?>" readonly>
@@ -79,5 +84,6 @@
                 </div>
             <?php endif; ?>
         </div>
+
     </body>
 </html>
