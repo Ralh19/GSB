@@ -19,8 +19,9 @@ body {
     background-color: #f5f5f5;
 }
 
-body > .container {
+body > .container{
     padding: 60px 15px 25px;
+
 }
 
 .container .text-muted {
@@ -31,6 +32,8 @@ body > .container {
     padding-right: 15px;
     padding-left: 15px;
 }
+
+
 
 footer .container p {
     text-align: center;
@@ -116,6 +119,7 @@ h2{
 }
 
 .btn-corriger{
+<<<<<<< HEAD
     background-color : green;
     color: white;
 }
@@ -125,3 +129,89 @@ h2{
     color : white;
 }
 
+=======
+    background-color: green;
+    color: white;
+
+}
+.btn-reinitialiser{
+    background-color: #bd0f0f      ;
+    color: white;
+}
+
+.inputs:nth-child(1){
+    display: flex;
+    gap:5px;
+}
+
+/* Section des éléments hors forfait */
+.elements-hors-forfait {
+    margin-top: 30px;
+    padding: 20px;
+    border: 2px solid #ff5722;  /* Bordure orange */
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}
+
+/* Tableau des éléments hors forfait */
+.table-hors-forfait {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.table-hors-forfait th, .table-hors-forfait td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.table-hors-forfait th {
+    background-color: #ff5722;  /* En-tête en orange */
+    color: white;
+}
+
+.table-hors-forfait input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.table-hors-forfait td button {
+    margin-top: 5px;
+    margin-right: 5px;
+}
+
+/* Boutons "Valider" et "Réinitialiser" */
+.form-group {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-valider, .btn-reinitialiser {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-valider {
+    background-color: #4CAF50; /* Vert pour Valider */
+    color: white;
+}
+
+.btn-valider:hover {
+    background-color: #45a049;
+}
+
+.btn-reinitialiser {
+    background-color: #f44336; /* Rouge pour Réinitialiser */
+    color: white;
+}
+
+.btn-reinitialiser:hover {
+    background-color: #e53935;
+}
+>>>>>>> 21eb142 (ajout description éléments hors forfaitisés)
