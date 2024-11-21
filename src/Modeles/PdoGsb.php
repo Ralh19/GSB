@@ -506,11 +506,57 @@ class PdoGsb {
                 . 'WHERE fichefrais.idvisiteur = :unIdVisiteur '
                 . 'AND fichefrais.mois = :unMois'
         );
-        $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur,
+                PDO::PARAM_STR);
         $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
         $requetePrepare->execute();
         $laLigne = $requetePrepare->fetch();
         return $laLigne;
+    }
+
+    public function getLesInfosFicheFrais2($idVisiteur, $mois): array {
+        // Récupérer les informations de la fiche de frais
+        $requetePrepare = $this->connexion->prepare(
+                'SELECT fichefrais.idetat as idEtat, '
+                . 'fichefrais.datemodif as dateModif, '
+                . 'fichefrais.nbjustificatifs as nbJustificatifs, '
+                . 'fichefrais.montantvalide as montantValide, '
+                . 'etat.libelle as libEtat '
+                . 'FROM fichefrais '
+                . 'INNER JOIN etat ON fichefrais.idetat = etat.id '
+                . 'WHERE fichefrais.idvisiteur = :unIdVisiteur '
+                . 'AND fichefrais.mois = :unMois'
+        );
+        $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
+        $requetePrepare->execute();
+        $ficheFrais = $requetePrepare->fetch(PDO::FETCH_ASSOC);
+
+        // Récupérer les éléments forfaitisés pour ce visiteur et ce mois
+        $requetePrepareForfait = $this->connexion->prepare(
+                'SELECT lignefraisforfait.idfraisforfait, lignefraisforfait.quantite, fraisforfait.libelle '
+                . 'FROM lignefraisforfait '
+                . 'INNER JOIN fraisforfait ON lignefraisforfait.idfraisforfait = fraisforfait.id '
+                . 'WHERE lignefraisforfait.idvisiteur = :unIdVisiteur '
+                . 'AND lignefraisforfait.mois = :unMois'
+        );
+        $requetePrepareForfait->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requetePrepareForfait->bindParam(':unMois', $mois, PDO::PARAM_STR);
+        $requetePrepareForfait->execute();
+        $elementsForfaitises = [];
+        while ($row = $requetePrepareForfait->fetch(PDO::FETCH_ASSOC)) {
+            $elementsForfaitises[] = [
+                'idfraisforfait' => $row['idfraisforfait'],
+                'quantite' => $row['quantite'],
+                'libelle' => $row['libelle']
+            ];
+        }
+
+        // Retourner à la fois les informations de la fiche de frais et les éléments forfaitisés
+        return [
+            'ficheFrais' => $ficheFrais,
+            'elementsForfaitises' => $elementsForfaitises
+        ];
     }
 
     /**
@@ -534,5 +580,29 @@ class PdoGsb {
         $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
         $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
         $requetePrepare->execute();
+    }
+
+    public function getElementsHorsForfait($idVisiteur, $mois): array {
+        $requetePrepare = $this->connexion->prepare(
+                'SELECT libelle, date, montant 
+         FROM lignefraishorsforfait
+         WHERE idvisiteur = :unIdVisiteur 
+         AND mois = :unMois'
+        );
+
+        $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requetePrepare->bindParam(':unMois', $mois, PDO::PARAM_STR);
+        $requetePrepare->execute();
+
+        $elementsHorsForfait = [];
+        while ($row = $requetePrepare->fetch(PDO::FETCH_ASSOC)) {
+            $elementsHorsForfait[] = [
+                'date' => $row['date'],
+                'libelle' => $row['libelle'],
+                'montant' => $row['montant']
+            ];
+        }
+
+        return $elementsHorsForfait;
     }
 }
