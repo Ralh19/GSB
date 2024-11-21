@@ -214,4 +214,24 @@ h2{
 .btn-reinitialiser:hover {
     background-color: #e53935;
 }
+<<<<<<< HEAD
 >>>>>>> 21eb142 (ajout description éléments hors forfaitisés)
+=======
+
+/* Section des justificatifs et actions */
+.justificatifs-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.nb-justificatifs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+
+>>>>>>> 1ebe351 (probleme footer réglé, ajout justificatif)
