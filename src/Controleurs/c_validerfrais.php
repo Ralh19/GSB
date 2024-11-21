@@ -10,39 +10,43 @@ if (!Utilitaires::estConnecteComptable()) {
 
 switch ($action) {
     case 'validerFrais':
-        // Récupérer les visiteurs depuis la base de données
+
         $lesVisiteurs = $pdo->getLesVisiteurs();
         $lesMois = [];
-        $infosFicheFrais = [];
-        $moisASelectionner = ''; // Initialiser la variable du mois sélectionné
-        $infosVisiteur = []; // Initialiser infosVisiteur comme un tableau vide
-        // Si un visiteur a été sélectionné
+        $ficheFrais = [];
+        $elementsForfaitises = [];
+        $elementsHorsForfait = [];
+        $moisASelectionner = '';
+        $infosVisiteur = [];
+
         if (isset($_POST['lstVisiteur'])) {
             $idVisiteur = filter_input(INPUT_POST, 'lstVisiteur', FILTER_SANITIZE_STRING);
-
-            // Sauvegarder l'ID du visiteur dans la session
             $_SESSION['idVisiteur'] = $idVisiteur;
 
-            // Récupérer les mois associés à ce visiteur où l'état est CR ou CL
             $lesMois = $pdo->getLesMoisDisponibles($idVisiteur);
 
-            // Récupérer les informations du visiteur pour l'affichage
             $infosVisiteur = $pdo->getVisiteurInfo($idVisiteur);
 
-            // Enregistrer le nom et le prénom du visiteur dans la session
             $_SESSION['nomVisiteur'] = $infosVisiteur['nom'];
             $_SESSION['prenomVisiteur'] = $infosVisiteur['prenom'];
         }
 
+
         // Si un mois a été sélectionné
         if (isset($_POST['lstMois'])) {
             $mois = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_STRING);
-            $moisASelectionner = $mois; // Enregistrer le mois sélectionné pour l'afficher
-            // Récupérer les éléments forfaitisés pour ce mois et ce visiteur
-            $infosFicheFrais = $pdo->getLesInfosFicheFrais($_SESSION['idVisiteur'], $mois);
+            $moisASelectionner = $mois; 
+            $resultatsFicheFrais = $pdo->getLesInfosFicheFrais2($_SESSION['idVisiteur'], $mois);
+            $ficheFrais = $resultatsFicheFrais['ficheFrais'];
+            $elementsForfaitises = $resultatsFicheFrais['elementsForfaitises'];
+
+            $elementsHorsForfait = $pdo->getElementsHorsForfait($_SESSION['idVisiteur'], $mois);
         }
 
-        // Passer les données à la vue pour l'affichage
-        include PATH_VIEWS . 'v_valider_fiche_frais.php'; // Inclure la vue pour afficher le formulaire
+
+
+
+        include PATH_VIEWS . 'v_valider_fiche_frais.php';
         break;
 }
+?>
