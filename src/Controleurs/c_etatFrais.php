@@ -42,6 +42,7 @@ switch ($action) {
         $libEtat = $lesInfosFicheFrais['libEtat'];
         $montantValide = $lesInfosFicheFrais['montantValide'];
         $nbJustificatifs = $lesInfosFicheFrais['nbJustificatifs'];
+        $indemniteKilometrique = $pdo->getFraisForfait($idVisiteur, $leMois, 'KM');
         $dateModif = Utilitaires::dateAnglaisVersFrancais($lesInfosFicheFrais['dateModif']);
         include PATH_VIEWS . 'v_etatFrais.php';
 }
