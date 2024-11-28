@@ -620,6 +620,97 @@ class PdoGsb {
             ];
         }
 
+
         return $elementsHorsForfait;
+    }
+
+    public function updateTempFraisForfait($idVisiteur, $mois, $idFraisForfait, $quantite) {
+        $requete = $this->connexion->prepare(
+                'UPDATE temp_lignefraisforfait
+         SET quantite = :quantite
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND idfraisforfait = :idFraisForfait'
+        );
+
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requete->bindParam(':idFraisForfait', $idFraisForfait, PDO::PARAM_STR);
+        $requete->bindParam(':quantite', $quantite, PDO::PARAM_INT);
+
+        $requete->execute();
+    }
+
+    public function reinitialiserTempFraisForfait($idVisiteur, $mois) {
+        $requete = $this->connexion->prepare(
+                'UPDATE temp_lignefraisforfait tf
+         INNER JOIN lignefraisforfait lf
+         ON tf.idvisiteur = lf.idvisiteur AND tf.mois = lf.mois AND tf.idfraisforfait = lf.idfraisforfait
+         SET tf.quantite = lf.quantite
+         WHERE tf.idvisiteur = :idVisiteur AND tf.mois = :mois'
+        );
+
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+
+        $requete->execute();
+    }
+
+    public function validerFraisForfait($idVisiteur, $mois) {
+        $this->connexion->prepare(
+                'UPDATE lignefraisforfait lff
+         JOIN temp_lignefraisforfait tlf
+         ON lff.idvisiteur = tlf.idvisiteur AND lff.mois = tlf.mois AND lff.idfraisforfait = tlf.idfraisforfait
+         SET lff.quantite = tlf.quantite
+         WHERE lff.idvisiteur = :idVisiteur AND lff.mois = :mois'
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+
+        // Supprimer les données de la table temporaire après validation
+        $this->connexion->prepare(
+                'DELETE FROM temp_lignefraisforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+    }
+
+    public function getCopieFraisForfait($idVisiteur, $mois): array {
+        $requetePrepare = $this->connexion->prepare(
+                'SELECT tlf.idfraisforfait, tlf.quantite, ff.libelle
+         FROM temp_lignefraisforfait tlf
+         INNER JOIN fraisforfait ff ON tlf.idfraisforfait = ff.id
+         WHERE tlf.idvisiteur = :idVisiteur AND tlf.mois = :mois'
+        );
+
+        $requetePrepare->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requetePrepare->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requetePrepare->execute();
+
+        $elementsForfaitises = [];
+        while ($row = $requetePrepare->fetch(PDO::FETCH_ASSOC)) {
+            $elementsForfaitises[] = [
+                'idfraisforfait' => $row['idfraisforfait'],
+                'quantite' => $row['quantite'],
+                'libelle' => $row['libelle']
+            ];
+        }
+
+        return $elementsForfaitises;
+    }
+
+    public function validerCopieFraisForfait(string $idVisiteur, string $mois): void {
+        // Supprimer les anciens enregistrements dans la table principale
+        $requeteDelete = $this->connexion->prepare(
+                'DELETE FROM lignefraisforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $requeteDelete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requeteDelete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requeteDelete->execute();
+
+        // Insérer les enregistrements depuis la table temporaire
+        $requeteInsert = $this->connexion->prepare(
+                'INSERT INTO lignefraisforfait (idvisiteur, mois, idfraisforfait, quantite)
+         SELECT idvisiteur, mois, idfraisforfait, quantite
+         FROM temp_lignefraisforfait
+         WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $requeteInsert->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requeteInsert->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requeteInsert->execute();
     }
 }

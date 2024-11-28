@@ -48,10 +48,9 @@ switch ($action) {
 >>>>>>> 9ba10ab (vivienne a disparu passons au élément forfaitisé)
         }
 
-
-        // Si un mois a été sélectionné
         if (isset($_POST['lstMois'])) {
             $mois = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_STRING);
+<<<<<<< HEAD
 <<<<<<< HEAD
 
             // Récupérer les éléments forfaitisés pour ce mois et ce visiteur
@@ -61,19 +60,64 @@ switch ($action) {
             $resultatsFicheFrais = $pdo->getLesInfosFicheFrais2($_SESSION['idVisiteur'], $mois);
             $ficheFrais = $resultatsFicheFrais['ficheFrais'];
             $elementsForfaitises = $resultatsFicheFrais['elementsForfaitises'];
+=======
+            $_SESSION['moisSelectionne'] = $mois;
+            $moisASelectionner = $mois;
+>>>>>>> 68641ee (buton corriger et reintialiser element forfaitisé marche mais pas valider)
 
+            // Charger les frais pour ce mois
+            $elementsForfaitises = $pdo->getCopieFraisForfait($_SESSION['idVisiteur'], $mois);
             $elementsHorsForfait = $pdo->getElementsHorsForfait($_SESSION['idVisiteur'], $mois);
 >>>>>>> 21eb142 (ajout description éléments hors forfaitisés)
         }
 
+        include PATH_VIEWS . 'v_valider_fiche_frais.php';
+        break;
 
+    case 'corrigerReinitialiserForfait':
+        $actionForfait = filter_input(INPUT_POST, 'actionForfait', FILTER_SANITIZE_STRING);
+        $idVisiteur = $_SESSION['idVisiteur'];
+        $mois = $_SESSION['moisSelectionne'];
+        $moisASelectionner = $mois; // Ajoutez cette ligne pour éviter l'erreur
 
+        if ($actionForfait === 'corriger') {
+            foreach ($_POST as $key => $value) {
+                if (strpos($key, 'quantite_') === 0) {
+                    $idFraisForfait = str_replace('quantite_', '', $key);
+                    $pdo->updateTempFraisForfait($idVisiteur, $mois, $idFraisForfait, $value);
+                }
+            }
+        } elseif ($actionForfait === 'reinitialiser') {
+            $pdo->reinitialiserTempFraisForfait($idVisiteur, $mois);
+        }
+
+        $elementsForfaitises = $pdo->getCopieFraisForfait($idVisiteur, $mois);
+        $elementsHorsForfait = $pdo->getElementsHorsForfait($idVisiteur, $mois);
 
         include PATH_VIEWS . 'v_valider_fiche_frais.php';
         break;
+<<<<<<< HEAD
 <<<<<<< HEAD
 }
 =======
 }
 ?>
 >>>>>>> 21eb142 (ajout description éléments hors forfaitisés)
+=======
+
+    case 'validerCopieFraisForfait':
+
+        $idVisiteur = $_SESSION['idVisiteur'];
+        $mois = $_SESSION['moisSelectionne'];
+
+        // Remplacer les données originales par la copie
+        $pdo->validerCopieFraisForfait($idVisiteur, $mois);
+
+        // Recharger les données après validation
+        $elementsForfaitises = $pdo->getCopieFraisForfait($idVisiteur, $mois);
+        $elementsHorsForfait = $pdo->getElementsHorsForfait($idVisiteur, $mois);
+
+        include PATH_VIEWS . 'v_valider_fiche_frais.php';
+        break;
+}
+>>>>>>> 68641ee (buton corriger et reintialiser element forfaitisé marche mais pas valider)
