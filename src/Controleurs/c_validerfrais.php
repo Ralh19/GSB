@@ -68,16 +68,22 @@ switch ($action) {
         break;
 
     case 'validerCopieFraisForfait':
+        $idVisiteur = $_SESSION['idVisiteur'] ?? null;
+        $mois = $_SESSION['moisSelectionne'] ?? null;
 
-        $idVisiteur = $_SESSION['idVisiteur'];
-        $mois = $_SESSION['moisSelectionne'];
+        if ($idVisiteur && $mois) {
+            $pdo->validerCopieFraisForfait($idVisiteur, $mois);
 
-        // Remplacer les données originales par la copie
-        $pdo->validerCopieFraisForfait($idVisiteur, $mois);
+            // Définir un message de succès dans la session
+            $_SESSION['alert'] = 'Fiche de frais validée avec succès.';
+        }
 
-        // Recharger les données après validation
-        $elementsForfaitises = $pdo->getCopieFraisForfait($idVisiteur, $mois);
-        $elementsHorsForfait = $pdo->getElementsHorsForfait($idVisiteur, $mois);
+        // Réinitialiser la session pour revenir à la sélection
+        unset($_SESSION['idVisiteur'], $_SESSION['moisSelectionne'], $_SESSION['nomVisiteur'], $_SESSION['prenomVisiteur']);
+
+        // Rediriger vers la page principale
+        header('Location: index.php?uc=validerfrais&action=validerFrais');
+        exit();
 
         include PATH_VIEWS . 'v_valider_fiche_frais.php';
         break;
