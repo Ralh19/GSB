@@ -31,22 +31,54 @@ switch ($action) {
             $_SESSION['prenomVisiteur'] = $infosVisiteur['prenom'];
         }
 
-
-        // Si un mois a été sélectionné
         if (isset($_POST['lstMois'])) {
             $mois = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_STRING);
-            $moisASelectionner = $mois; 
-            $resultatsFicheFrais = $pdo->getLesInfosFicheFrais2($_SESSION['idVisiteur'], $mois);
-            $ficheFrais = $resultatsFicheFrais['ficheFrais'];
-            $elementsForfaitises = $resultatsFicheFrais['elementsForfaitises'];
+            $_SESSION['moisSelectionne'] = $mois;
+            $moisASelectionner = $mois;
 
+            // Charger les frais pour ce mois
+            $elementsForfaitises = $pdo->getCopieFraisForfait($_SESSION['idVisiteur'], $mois);
             $elementsHorsForfait = $pdo->getElementsHorsForfait($_SESSION['idVisiteur'], $mois);
         }
 
+        include PATH_VIEWS . 'v_valider_fiche_frais.php';
+        break;
 
+    case 'corrigerReinitialiserForfait':
+        $actionForfait = filter_input(INPUT_POST, 'actionForfait', FILTER_SANITIZE_STRING);
+        $idVisiteur = $_SESSION['idVisiteur'];
+        $mois = $_SESSION['moisSelectionne'];
+        $moisASelectionner = $mois; // Ajoutez cette ligne pour éviter l'erreur
 
+        if ($actionForfait === 'corriger') {
+            foreach ($_POST as $key => $value) {
+                if (strpos($key, 'quantite_') === 0) {
+                    $idFraisForfait = str_replace('quantite_', '', $key);
+                    $pdo->updateTempFraisForfait($idVisiteur, $mois, $idFraisForfait, $value);
+                }
+            }
+        } elseif ($actionForfait === 'reinitialiser') {
+            $pdo->reinitialiserTempFraisForfait($idVisiteur, $mois);
+        }
+
+        $elementsForfaitises = $pdo->getCopieFraisForfait($idVisiteur, $mois);
+        $elementsHorsForfait = $pdo->getElementsHorsForfait($idVisiteur, $mois);
+
+        include PATH_VIEWS . 'v_valider_fiche_frais.php';
+        break;
+
+    case 'validerCopieFraisForfait':
+
+        $idVisiteur = $_SESSION['idVisiteur'];
+        $mois = $_SESSION['moisSelectionne'];
+
+        // Remplacer les données originales par la copie
+        $pdo->validerCopieFraisForfait($idVisiteur, $mois);
+
+        // Recharger les données après validation
+        $elementsForfaitises = $pdo->getCopieFraisForfait($idVisiteur, $mois);
+        $elementsHorsForfait = $pdo->getElementsHorsForfait($idVisiteur, $mois);
 
         include PATH_VIEWS . 'v_valider_fiche_frais.php';
         break;
 }
-?>
