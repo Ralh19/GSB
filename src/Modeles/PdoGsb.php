@@ -713,4 +713,30 @@ class PdoGsb {
         $requeteInsert->bindParam(':mois', $mois, PDO::PARAM_STR);
         $requeteInsert->execute();
     }
+
+    public function calculerIndemniteKilometrique($idVisiteur, $distance) {
+        // Récupération du type de véhicule déclaré
+        $requetePrepare = $this->connexion->prepare(
+                'SELECT typeVehicule FROM visiteur WHERE id = :idVisiteur'
+        );
+        $requetePrepare->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requetePrepare->execute();
+
+        $typeVehicule = $requetePrepare->fetchColumn();
+
+        // Tarifs en fonction du type de véhicule
+        $tarifs = [
+            '4CV Diesel' => 0.52,
+            '5/6CV Diesel' => 0.58,
+            '4CV Essence' => 0.62,
+            '5/6CV Essence' => 0.67
+        ];
+
+        // Calcul de l'indemnité kilométrique
+        if (isset($tarifs[$typeVehicule])) {
+            return $distance * $tarifs[$typeVehicule];
+        } else {
+            return 0; // Si le type de véhicule est inconnu ou non déclaré
+        }
+    }
 }
