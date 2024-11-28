@@ -1,4 +1,10 @@
 <div class="container">
+    <?php if (isset($_SESSION['alert'])): ?>
+        <script>
+            alert("<?= htmlspecialchars($_SESSION['alert']) ?>");
+        </script>
+        <?php unset($_SESSION['alert']); // Supprimer l'alerte après affichage ?>
+    <?php endif; ?>
     <h2>Validation des fiches de frais</h2>
 
     <!-- Formulaire de sélection du visiteur -->
