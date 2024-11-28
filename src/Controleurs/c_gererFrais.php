@@ -14,7 +14,6 @@
  * @version   GIT: <0>
  * @link      http://www.reseaucerta.org Contexte « Laboratoire GSB »
  */
-
 use Outils\Utilitaires;
 
 $idVisiteur = $_SESSION['idVisiteur'];
@@ -39,7 +38,7 @@ switch ($action) {
         break;
     case 'validerCreationFrais':
         $dateFrais = Utilitaires::dateAnglaisVersFrancais(
-            filter_input(INPUT_POST, 'dateFrais', FILTER_SANITIZE_FULL_SPECIAL_CHARS)
+                        filter_input(INPUT_POST, 'dateFrais', FILTER_SANITIZE_FULL_SPECIAL_CHARS)
         );
         $libelle = filter_input(INPUT_POST, 'libelle', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $montant = filter_input(INPUT_POST, 'montant', FILTER_VALIDATE_FLOAT);
@@ -53,6 +52,27 @@ switch ($action) {
     case 'supprimerFrais':
         $idFrais = filter_input(INPUT_GET, 'idFrais', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $pdo->supprimerFraisHorsForfait($idFrais);
+        break;
+
+    case 'calculerIndemniteKilometrique':
+        $typeVehicule = filter_input(INPUT_POST, 'typeVehicule', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+        $tarifs = [
+            '4CV Diesel' => 0.52,
+            '5/6CV Diesel' => 0.58,
+            '4CV Essence' => 0.62,
+            '5/6CV Essence' => 0.67
+        ];
+
+        if (array_key_exists($typeVehicule, $tarifs)) {
+            $distance = $pdo->getFraisForfait($idVisiteur, $mois, 'KM')['quantite'];
+            $indemniteKilometrique = $distance * $tarifs[$typeVehicule];
+        } else {
+            $indemniteKilometrique = 0;
+        }
+
+        // Inclure les informations pour l'affichage
+        include PATH_VIEWS . 'v_listeFraisForfait.php';
         break;
 }
 $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($idVisiteur, $mois);

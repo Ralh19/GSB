@@ -722,4 +722,13 @@ class PdoGsb {
             return 0; // Si le type de véhicule est inconnu ou non déclaré
         }
     }
+    
+    public function getTypeVehiculeVisiteur($idVisiteur)
+{
+    $requete = "SELECT typeVehicule FROM visiteur WHERE id = :idVisiteur";
+    $stmt = $this->connexion->prepare($requete);
+    $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC)['typeVehicule'] ?? '4CV Diesel'; // Valeur par défaut
+}
 }
