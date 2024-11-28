@@ -264,6 +264,12 @@
                                name="quantite_<?= htmlspecialchars($element['idfraisforfait']) ?>" 
                                value="<?= htmlspecialchars($element['quantite']) ?>">
                            <?php endforeach; ?>
+                    <div class="form-group">
+                        <label for="typeVehicule">Type de véhicule :</label>
+                        <input type="text" id="typeVehicule" name="typeVehicule" 
+                               value="<?= htmlspecialchars($typeVehicule) ?>" 
+                               class="form-control" readonly>
+                    </div>
                 </div>
                 <!-- Boutons Corriger et Réinitialiser -->
                 <div class="btn-group">

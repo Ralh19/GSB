@@ -68,7 +68,12 @@ switch ($action) {
             // Charger les frais pour ce mois
             $elementsForfaitises = $pdo->getCopieFraisForfait($_SESSION['idVisiteur'], $mois);
             $elementsHorsForfait = $pdo->getElementsHorsForfait($_SESSION['idVisiteur'], $mois);
+<<<<<<< HEAD
 >>>>>>> 21eb142 (ajout description éléments hors forfaitisés)
+=======
+            
+            $typeVehicule = $pdo->getTypeVehiculeVisiteur($_SESSION['idVisiteur']);
+>>>>>>> 7f81521 (ajout indemnité kilometrique)
         }
 
         include PATH_VIEWS . 'v_valider_fiche_frais.php';
