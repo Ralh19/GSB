@@ -67,14 +67,6 @@
                                name="quantite_<?= htmlspecialchars($element['idfraisforfait']) ?>" 
                                value="<?= htmlspecialchars($element['quantite']) ?>">
                            <?php endforeach; ?>
-                    <!-- Dropdown pour le type de véhicule -->
-                    <label for="typeVehicule">Type de véhicule :</label>
-                    <select name="typeVehicule" id="typeVehicule" class="form-control" required>
-                        <option value="4CV Diesel" <?= (isset($typeVehicule) && $typeVehicule === '4CV Diesel') ? 'selected' : '' ?>>4CV Diesel</option>
-                        <option value="5/6CV Diesel" <?= (isset($typeVehicule) && $typeVehicule === '5/6CV Diesel') ? 'selected' : '' ?>>5/6CV Diesel</option>
-                        <option value="4CV Essence" <?= (isset($typeVehicule) && $typeVehicule === '4CV Essence') ? 'selected' : '' ?>>4CV Essence</option>
-                        <option value="5/6CV Essence" <?= (isset($typeVehicule) && $typeVehicule === '5/6CV Essence') ? 'selected' : '' ?>>5/6CV Essence</option>
-                    </select>
                 </div>
                 <!-- Boutons Corriger et Réinitialiser -->
                 <div class="btn-group">
