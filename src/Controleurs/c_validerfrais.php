@@ -39,8 +39,6 @@ switch ($action) {
             // Charger les frais pour ce mois
             $elementsForfaitises = $pdo->getCopieFraisForfait($_SESSION['idVisiteur'], $mois);
             $elementsHorsForfait = $pdo->getElementsHorsForfait($_SESSION['idVisiteur'], $mois);
-            
-            $typeVehicule = $pdo->getTypeVehiculeVisiteur($_SESSION['idVisiteur']);
         }
 
         include PATH_VIEWS . 'v_valider_fiche_frais.php';
@@ -70,9 +68,11 @@ switch ($action) {
         break;
 
     case 'validerCopieFraisForfait':
-        $idVisiteur = $_SESSION['idVisiteur'] ?? null;
-        $mois = $_SESSION['moisSelectionne'] ?? null;
 
+        $idVisiteur = $_SESSION['idVisiteur'];
+        $mois = $_SESSION['moisSelectionne'];
+
+        // Remplacer les données originales par la copie
         if ($idVisiteur && $mois) {
             $pdo->validerCopieFraisForfait($idVisiteur, $mois);
 
