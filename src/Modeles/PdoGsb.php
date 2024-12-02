@@ -607,10 +607,10 @@ class PdoGsb {
         return $elementsHorsForfait;
     }
 
-    public function updateTempFraisForfait($idVisiteur, $mois, $idFraisForfait, $quantite) {
+    public function updateTempFraisForfait($idVisiteur, $mois, $idFraisForfait, $quantite, $typeVehicule = null) {
         $requete = $this->connexion->prepare(
                 'UPDATE temp_lignefraisforfait
-         SET quantite = :quantite
+         SET quantite = :quantite, typeVehicule = :typeVehicule
          WHERE idvisiteur = :idVisiteur AND mois = :mois AND idfraisforfait = :idFraisForfait'
         );
 
@@ -618,6 +618,7 @@ class PdoGsb {
         $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
         $requete->bindParam(':idFraisForfait', $idFraisForfait, PDO::PARAM_STR);
         $requete->bindParam(':quantite', $quantite, PDO::PARAM_INT);
+        $requete->bindParam(':typeVehicule', $typeVehicule, PDO::PARAM_STR);
 
         $requete->execute();
     }
@@ -627,7 +628,7 @@ class PdoGsb {
                 'UPDATE temp_lignefraisforfait tf
          INNER JOIN lignefraisforfait lf
          ON tf.idvisiteur = lf.idvisiteur AND tf.mois = lf.mois AND tf.idfraisforfait = lf.idfraisforfait
-         SET tf.quantite = lf.quantite
+         SET tf.quantite = lf.quantite, tf.typeVehicule = lf.typeVehicule
          WHERE tf.idvisiteur = :idVisiteur AND tf.mois = :mois'
         );
 
@@ -642,7 +643,7 @@ class PdoGsb {
                 'UPDATE lignefraisforfait lff
          JOIN temp_lignefraisforfait tlf
          ON lff.idvisiteur = tlf.idvisiteur AND lff.mois = tlf.mois AND lff.idfraisforfait = tlf.idfraisforfait
-         SET lff.quantite = tlf.quantite
+         SET lff.quantite = tlf.quantite, lff.typeVehicule = tlf.typeVehicule
          WHERE lff.idvisiteur = :idVisiteur AND lff.mois = :mois'
         )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
 
@@ -654,7 +655,7 @@ class PdoGsb {
 
     public function getCopieFraisForfait($idVisiteur, $mois): array {
         $requetePrepare = $this->connexion->prepare(
-                'SELECT tlf.idfraisforfait, tlf.quantite, ff.libelle
+                'SELECT tlf.idfraisforfait, tlf.quantite, tlf.typeVehicule, ff.libelle
          FROM temp_lignefraisforfait tlf
          INNER JOIN fraisforfait ff ON tlf.idfraisforfait = ff.id
          WHERE tlf.idvisiteur = :idVisiteur AND tlf.mois = :mois'
@@ -669,7 +670,8 @@ class PdoGsb {
             $elementsForfaitises[] = [
                 'idfraisforfait' => $row['idfraisforfait'],
                 'quantite' => $row['quantite'],
-                'libelle' => $row['libelle']
+                'libelle' => $row['libelle'],
+                'typeVehicule' => $row['typeVehicule'] // Nouveau champ
             ];
         }
 
@@ -687,8 +689,8 @@ class PdoGsb {
 
         // Insérer les enregistrements depuis la table temporaire
         $requeteInsert = $this->connexion->prepare(
-                'INSERT INTO lignefraisforfait (idvisiteur, mois, idfraisforfait, quantite)
-         SELECT idvisiteur, mois, idfraisforfait, quantite
+                'INSERT INTO lignefraisforfait (idvisiteur, mois, idfraisforfait, quantite, typeVehicule)
+         SELECT idvisiteur, mois, idfraisforfait, quantite, typeVehicule
          FROM temp_lignefraisforfait
          WHERE idvisiteur = :idVisiteur AND mois = :mois'
         );
@@ -722,13 +724,37 @@ class PdoGsb {
             return 0; // Si le type de véhicule est inconnu ou non déclaré
         }
     }
-    
-    public function getTypeVehiculeVisiteur($idVisiteur)
-{
-    $requete = "SELECT typeVehicule FROM visiteur WHERE id = :idVisiteur";
-    $stmt = $this->connexion->prepare($requete);
-    $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
-    $stmt->execute();
-    return $stmt->fetch(PDO::FETCH_ASSOC)['typeVehicule'] ?? '4CV Diesel'; // Valeur par défaut
-}
+
+    public function getTypeVehiculeVisiteur($idVisiteur) {
+        $requete = "SELECT typeVehicule FROM visiteur WHERE id = :idVisiteur";
+        $stmt = $this->connexion->prepare($requete);
+        $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['typeVehicule'] ?? '4CV Diesel'; // Valeur par défaut
+    }
+
+    public function getFraisForfait($idVisiteur, $mois): array {
+        $requetePrepare = $this->connexion->prepare(
+                'SELECT lff.idfraisforfait, lff.quantite, ff.libelle, lff.typeVehicule
+         FROM lignefraisforfait lff
+         INNER JOIN fraisforfait ff ON lff.idfraisforfait = ff.id
+         WHERE lff.idvisiteur = :idVisiteur AND lff.mois = :mois'
+        );
+
+        $requetePrepare->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requetePrepare->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requetePrepare->execute();
+
+        $fraisForfait = [];
+        while ($row = $requetePrepare->fetch(PDO::FETCH_ASSOC)) {
+            $fraisForfait[] = [
+                'idfraisforfait' => $row['idfraisforfait'],
+                'quantite' => $row['quantite'],
+                'libelle' => $row['libelle'],
+                'typeVehicule' => $row['typeVehicule'] ?? null // Inclure typeVehicule si disponible
+            ];
+        }
+
+        return $fraisForfait;
+    }
 }
