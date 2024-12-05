@@ -93,9 +93,9 @@
                 <tbody>
                     <?php foreach ($elementsHorsForfait as $index => $element): ?>
                         <tr>
-                            <td><input type="date" name="date_<?= $index ?>" value="<?= htmlspecialchars($element['date']) ?>" ></td>
-                            <td><input type="text" name="libelle_<?= $index ?>" value="<?= htmlspecialchars($element['libelle']) ?>" ></td>
-                            <td><input type="number" name="montant_<?= $index ?>" value="<?= htmlspecialchars($element['montant']) ?>" step="0.01" ></td>
+                            <td><input type="date" name="date_<?= $index ?>" value="<?= htmlspecialchars($element['date']) ?>" readonly></td>
+                            <td><input type="text" name="libelle_<?= $index ?>" value="<?= htmlspecialchars($element['libelle']) ?>" readonly></td>
+                            <td><input type="number" name="montant_<?= $index ?>" value="<?= htmlspecialchars($element['montant']) ?>" step="0.01" readonly></td>
                             <td>
                                 <button type="button" class="btn btn-valider">Corriger</button>
                                 <button type="button" class="btn btn-reinitialiser">Réinitialiser</button>
