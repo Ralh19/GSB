@@ -7,15 +7,24 @@
     <?php endif; ?>
     <h2>Validation des fiches de frais</h2>
 
+    <!-- Formulaire de sélection du visiteur -->
     <form method="post" action="index.php?uc=validerfrais&action=validerFrais">
         <div class="form-group form-row">
             <label for="lstVisiteur">Choisir le visiteur :</label>
-            <input list="visiteurs" name="lstVisiteurNomPrenom" id="lstVisiteur" class="form-control" required placeholder="Saisir le nom du visiteur">
-            <datalist id="visiteurs">
+            <select name="lstVisiteur" id="lstVisiteur" required>
+                <option value="">Sélectionner un visiteur</option>
                 <?php foreach ($lesVisiteurs as $visiteur): ?>
-                    <option value="<?= htmlspecialchars($visiteur['nom'] . ' ' . $visiteur['prenom']) ?>"></option>
+                    <option value="<?= htmlspecialchars($visiteur['id']) ?>" 
+                            <?= isset($idVisiteur) && $idVisiteur == $visiteur['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($visiteur['nom'] . ' ' . $visiteur['prenom']) ?>
+                    </option>
                 <?php endforeach; ?>
-            </datalist>
+            </select>
+            <?php if (isset($moisASelectionner) && !empty($moisASelectionner)): ?>
+                <span style="margin-left: 20px; font-weight: bold;">
+                    Mois sélectionné : <?= substr($moisASelectionner, 4, 2) . '/' . substr($moisASelectionner, 0, 4); ?>
+                </span>
+            <?php endif; ?>
             <button type="submit" class="btn btn-suivant">Suivant</button>
         </div>
     </form>
@@ -72,40 +81,39 @@
     <?php if (isset($elementsHorsForfait) && !empty($elementsHorsForfait)): ?>
         <div class="elements-hors-forfait">
             <h3>Descriptif des éléments hors forfait</h3>
-            <form method="post" action="index.php?uc=validerfrais&action=corrigerReinitialiserHorsForfait">
-                <table class="table-hors-forfait">
-                    <thead>
+            <table class="table-hors-forfait">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Libellé</th>
+                        <th>Montant</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($elementsHorsForfait as $index => $element): ?>
                         <tr>
-                            <th>Date</th>
-                            <th>Libellé</th>
-                            <th>Montant</th>
-                            <th>Action</th>
+                            <td><input type="date" name="date_<?= $index ?>" value="<?= htmlspecialchars($element['date']) ?>" ></td>
+                            <td><input type="text" name="libelle_<?= $index ?>" value="<?= htmlspecialchars($element['libelle']) ?>" ></td>
+                            <td><input type="number" name="montant_<?= $index ?>" value="<?= htmlspecialchars($element['montant']) ?>" step="0.01" ></td>
+                            <td>
+                                <button type="button" class="btn btn-valider">Corriger</button>
+                                <button type="button" class="btn btn-reinitialiser">Réinitialiser</button>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($elementsHorsForfait as $index => $element): ?>
-                            <tr>
-                                <td><input type="date" name="date_<?= $index ?>" value="<?= htmlspecialchars($element['date']) ?>" ></td>
-                                <td><input type="text" name="libelle_<?= $index ?>" value="<?= htmlspecialchars($element['libelle']) ?>" ></td>
-                                <td><input type="number" name="montant_<?= $index ?>" value="<?= htmlspecialchars($element['montant']) ?>" step="0.01" ></td>
-                                <td>
-                                    <button type="button" class="btn btn-valider">Corriger</button>
-                                    <button type="button" class="btn btn-reinitialiser">Réinitialiser</button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </form>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     <?php endif; ?>
-    <!-- Justificatifs et boutons -->
+
+    <!-- Section des justificatifs -->
     <?php if (isset($moisASelectionner) && !empty($moisASelectionner)): ?>
         <div class="justificatifs-actions">
             <div class="nb-justificatifs">
                 <label for="nbJustificatifs">Nombre de justificatifs :</label>
                 <input type="number" id="nbJustificatifs" name="nbJustificatifs" 
-                       value="<?= htmlspecialchars($ficheFrais['nbJustificatifs'] ?? '0') ?>" >
+                       value="<?= htmlspecialchars($ficheFrais['nbJustificatifs'] ?? '0') ?>" readonly>
             </div>
             <div class="btn-group" style="margin-top: 15px;">
                 <form method="post" action="index.php?uc=validerfrais&action=validerCopieFraisForfait">
@@ -117,5 +125,4 @@
             </div>
         </div>
     <?php endif; ?>
-
 </div>
