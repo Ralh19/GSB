@@ -864,17 +864,84 @@ class PdoGsb {
 
         $requete->execute();
     }
-    
+
     public function getIdVisiteurParNomPrenom(string $nomPrenom): ?string {
-    $requetePrepare = $this->connexion->prepare(
-        'SELECT id 
+        $requetePrepare = $this->connexion->prepare(
+                'SELECT id 
          FROM visiteur 
          WHERE CONCAT(nom, " ", prenom) = :nomPrenom'
-    );
-    $requetePrepare->bindParam(':nomPrenom', $nomPrenom, PDO::PARAM_STR);
-    $requetePrepare->execute();
+        );
+        $requetePrepare->bindParam(':nomPrenom', $nomPrenom, PDO::PARAM_STR);
+        $requetePrepare->execute();
 
-    $result = $requetePrepare->fetch(PDO::FETCH_ASSOC);
-    return $result['id'] ?? null;
-}
+        $result = $requetePrepare->fetch(PDO::FETCH_ASSOC);
+        return $result['id'] ?? null;
+    }
+
+    public function updateTempHorsForfaitLibelle($idVisiteur, $mois, $idHorsForfait, $libelle) {
+        $requete = $this->connexion->prepare(
+                'UPDATE temp_lignefraishorsforfait
+         SET libelle = :libelle
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idHorsForfait'
+        );
+        $requete->execute([
+            ':libelle' => $libelle,
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+            ':idHorsForfait' => $idHorsForfait
+        ]);
+    }
+
+    public function updateTempHorsForfaitMontant($idVisiteur, $mois, $idHorsForfait, $montant) {
+        $requete = $this->connexion->prepare(
+                'UPDATE temp_lignefraishorsforfait
+         SET montant = :montant
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idHorsForfait'
+        );
+        $requete->execute([
+            ':montant' => $montant,
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+            ':idHorsForfait' => $idHorsForfait
+        ]);
+    }
+
+    public function updateTempHorsForfaitDate($idVisiteur, $mois, $idHorsForfait, $date) {
+        $requete = $this->connexion->prepare(
+                'UPDATE temp_lignefraishorsforfait
+         SET date = :date
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idHorsForfait'
+        );
+        $requete->execute([
+            ':date' => $date,
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+            ':idHorsForfait' => $idHorsForfait
+        ]);
+    }
+
+    public function validerCopieHorsForfait($idVisiteur, $mois) {
+        // Suppression des anciens frais hors forfait
+        $this->connexion->prepare(
+                'DELETE FROM lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+
+        // Insertion des frais hors forfait depuis la table temporaire
+        $this->connexion->prepare(
+                'INSERT INTO lignefraishorsforfait (id, idvisiteur, mois, libelle, date, montant)
+         SELECT id, idvisiteur, mois, libelle, date, montant
+         FROM temp_lignefraishorsforfait
+         WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+    }
+
+    public function clearTablesTemp($idVisiteur, $mois) {
+        $this->connexion->prepare(
+                'DELETE FROM temp_lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+
+        $this->connexion->prepare(
+                'DELETE FROM temp_lignefraisforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+    }
 }
