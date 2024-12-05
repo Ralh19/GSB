@@ -727,4 +727,6 @@ class PdoGsb {
 
         return $fraisForfait;
     }
+
+    
 }
