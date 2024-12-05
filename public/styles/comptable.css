@@ -231,19 +231,6 @@ datalist {
     gap: 10px;
 }
 
-/* Champ de saisie du datalist */
-input[list="visiteurs"] {
-    background-color: white; /* Fond blanc */
-    color: black; /* Texte noir */
-    border: 1px solid #ccc; /* Bordure grise */
-    padding: 5px;
-    border-radius: 4px;
-    width: 100%; /* Assure la bonne largeur */
-}
 
-/* Options du datalist */
-datalist option {
-    background-color: white; /* Fond blanc */
-    color: black; /* Texte noir */
-}
+
 
