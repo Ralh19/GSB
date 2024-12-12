@@ -193,7 +193,7 @@ datalist {
 
 }
 
-.btn-valider, .btn-reinitialiser {
+.btn-valider, .btn-reinitialiser, .btn-reporter {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -257,4 +257,13 @@ datalist option {
 #lstMois{
     margin-left: 20px;
     margin-right: 20px;
+}
+
+.btn-reporter{
+    background-color : lightseagreen;
+    color: white;
+}
+
+.btn-reporter:hover{
+    background-color : lightseagreen;
 }

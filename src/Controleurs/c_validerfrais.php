@@ -144,6 +144,8 @@ switch ($action) {
         } elseif ($actionHorsForfait === 'reinitialiser') {
             $pdo->reinitialiserTempHorsForfait($idVisiteur, $mois);
         }
+        
+        $moisASelectionner = $mois;
 
         $elementsForfaitises = $pdo->getCopieFraisForfait($idVisiteur, $mois);
         $elementsHorsForfait = $pdo->getTempHorsForfait($idVisiteur, $mois);
@@ -164,4 +166,27 @@ switch ($action) {
         $_SESSION['alert'] = 'Éléments hors forfait validés avec succès.';
         header('Location: index.php?uc=validerfrais&action=validerFrais');
         exit;
+
+    case 'reinitialiserTout':
+        $idVisiteur = $_SESSION['idVisiteur'];
+        $mois = $_SESSION['moisSelectionne'];
+
+        if ($idVisiteur && $mois) {
+            // Reinitialize both forfaitized and non-forfaitized elements
+            $pdo->reinitialiserTempFraisForfait($idVisiteur, $mois);
+            $pdo->reinitialiserTempHorsForfait($idVisiteur, $mois);
+
+            // Set a success message
+            $_SESSION['alert'] = 'Toutes les modifications ont été réinitialisées.';
+        }
+
+        $moisASelectionner = $mois;
+
+        // Reload data for display
+        $elementsForfaitises = $pdo->getCopieFraisForfait($idVisiteur, $mois);
+        $elementsHorsForfait = $pdo->getTempHorsForfait($idVisiteur, $mois);
+
+        include PATH_VIEWS . 'v_valider_fiche_frais.php';
+        break;
+
 }

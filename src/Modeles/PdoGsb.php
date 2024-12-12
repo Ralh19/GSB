@@ -777,16 +777,17 @@ class PdoGsb {
     }
 
     public function copierHorsForfaitDansTemp($idVisiteur, $mois) {
-        $this->connexion->prepare(
-                'DELETE FROM temp_lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
-        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
-
-        $this->connexion->prepare(
+        $requete = $this->connexion->prepare(
                 'INSERT INTO temp_lignefraishorsforfait (id, idvisiteur, mois, libelle, date, montant)
-         SELECT id, idvisiteur, mois, libelle, date, montant
-         FROM lignefraishorsforfait
-         WHERE idvisiteur = :idVisiteur AND mois = :mois'
-        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+         SELECT lhf.id, lhf.idvisiteur, lhf.mois, lhf.libelle, lhf.date, lhf.montant
+         FROM lignefraishorsforfait lhf
+         WHERE lhf.idvisiteur = :idVisiteur AND lhf.mois = :mois
+         AND NOT EXISTS (
+             SELECT 1 FROM temp_lignefraishorsforfait t
+             WHERE t.id = lhf.id
+         )'
+        );
+        $requete->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
     }
 
     public function getTempHorsForfait($idVisiteur, $mois) {
@@ -802,20 +803,20 @@ class PdoGsb {
         return $requete->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function updateTempHorsForfait($idVisiteur, $mois, $idFrais, $libelle, $montant) {
+    public function updateTempHorsForfait($idVisiteur, $mois, $idHorsForfait, $libelle, $montant, $date) {
         $requete = $this->connexion->prepare(
                 'UPDATE temp_lignefraishorsforfait
-         SET libelle = :libelle, montant = :montant
-         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idFrais'
+         SET libelle = :libelle, montant = :montant, date = :date
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idHorsForfait'
         );
-
-        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
-        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
-        $requete->bindParam(':idFrais', $idFrais, PDO::PARAM_INT);
-        $requete->bindParam(':libelle', $libelle, PDO::PARAM_STR);
-        $requete->bindParam(':montant', $montant, PDO::PARAM_STR);
-
-        $requete->execute();
+        $requete->execute([
+            ':libelle' => $libelle,
+            ':montant' => $montant,
+            ':date' => $date,
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+            ':idHorsForfait' => $idHorsForfait
+        ]);
     }
 
     public function validerTempHorsForfait($idVisiteur, $mois) {
@@ -931,18 +932,24 @@ class PdoGsb {
     }
 
     public function validerCopieHorsForfait($idVisiteur, $mois) {
-        // Suppression des anciens frais hors forfait
-        $this->connexion->prepare(
+        // Supprimer uniquement les lignes de ce mois
+        $requeteDelete = $this->connexion->prepare(
                 'DELETE FROM lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
-        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+        );
+        $requeteDelete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requeteDelete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requeteDelete->execute();
 
-        // Insertion des frais hors forfait depuis la table temporaire
-        $this->connexion->prepare(
+        // Copier les lignes depuis la table temporaire
+        $requeteInsert = $this->connexion->prepare(
                 'INSERT INTO lignefraishorsforfait (id, idvisiteur, mois, libelle, date, montant)
          SELECT id, idvisiteur, mois, libelle, date, montant
          FROM temp_lignefraishorsforfait
          WHERE idvisiteur = :idVisiteur AND mois = :mois'
-        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+        );
+        $requeteInsert->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requeteInsert->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requeteInsert->execute();
     }
 
     public function clearTablesTemp($idVisiteur, $mois) {
