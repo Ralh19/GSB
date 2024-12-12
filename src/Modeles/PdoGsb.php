@@ -127,30 +127,50 @@ class PdoGsb
         return $lesVisiteurs;
     }
 
-    public function getMoisDisponibles($idVisiteur): array {
-        // Debug : Afficher l'ID du visiteur passé à la méthode
-        var_dump($idVisiteur); // Vérifie si l'ID du visiteur est bien passé à la méthode
-        // Requête SQL pour récupérer les mois
-        $req = "
-    SELECT fichefrais.mois
-    FROM fichefrais
-    INNER JOIN visiteur ON fichefrais.idvisiteur = visiteur.id
-    WHERE fichefrais.idetat IN ('CR', 'CL')
-    AND fichefrais.idvisiteur = :idVisiteur
-    ORDER BY fichefrais.mois DESC
-    ";
+    /** 
+     * Retourne les informations d'un visiteur
+     * 
+     * @param String $login Login du visiteur
+     * 
+     * @return mdpVisiteur||mdpComptable sous la forme hacher
+     */
+    public function getMdpUtilisateur($login)
+    {
+        $requetePrepare = $this->connexion->prepare(
+            'SELECT mdp '
+                . 'FROM comptable '
+                . 'WHERE comptable.login = :unLogin'
+        );
+        $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
+        $requetePrepare->execute();
+        $comptable = $requetePrepare->fetch(PDO::FETCH_OBJ)->mdp;
 
-        // Préparer et exécuter la requête
+        if (isset($comptable)) {
+            return $comptable;
+        }
+
+        $requetePrepare = $this->connexion->prepare(
+            'SELECT mdp '
+                . 'FROM visiteur '
+                . 'WHERE visiteur.login = :unLogin'
+        );
+        $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
+        $requetePrepare->execute();
+        $visiteur = $requetePrepare->fetch(PDO::FETCH_OBJ)->mdp;
+
+        return $visiteur;
+    }
+
+
+    public function getMoisDisponibles(): array
+    {
+        $req = "SELECT DISTINCT mois FROM fichefrais ORDER BY mois DESC";
         $stmt = $this->connexion->prepare($req);
-        $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
         $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
         $stmt->execute();
 
         // Initialisation du tableau pour les mois
-        // Initialisation du tableau pour les mois
         $lesMois = [];
-
-        // Récupérer les résultats
 
         // Récupérer les résultats
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -163,7 +183,6 @@ class PdoGsb
                 'numMois' => $numMois
             ];
         }
-
 
         return $lesMois;
     }
@@ -479,8 +498,9 @@ class PdoGsb
      * @return un tableau associatif de clé un mois -aaaamm- et de valeurs
      *         l'année et le mois correspondant
      */
-    public function getLesMoisDisponibles($idVisiteur): array {
-        // Préparation de la requête SQL
+    public function getLesMoisDisponibles($idVisiteur): array
+    {
+        // Requête SQL pour récupérer les mois où l'état est "CR" ou "CL"
         $requetePrepare = $this->connexion->prepare(
             'SELECT fichefrais.mois AS mois FROM fichefrais '
                 . 'WHERE fichefrais.idvisiteur = :unIdVisiteur '
@@ -537,7 +557,7 @@ class PdoGsb
     public function getLesInfosFicheFrais($idVisiteur, $mois): array
     {
         $requetePrepare = $this->connexion->prepare(
-                'SELECT fichefrais.idetat as idetat, '
+            'SELECT fichefrais.idetat as idEtat, '
                 . 'fichefrais.datemodif as dateModif,'
                 . 'fichefrais.nbjustificatifs as nbJustificatifs, '
                 . 'fichefrais.montantvalide as montantValide, '
