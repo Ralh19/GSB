@@ -127,7 +127,6 @@ class PdoGsb
         return $lesVisiteurs;
     }
 
-<<<<<<< HEAD
     public function getMoisDisponibles($idVisiteur): array {
         // Debug : Afficher l'ID du visiteur passé à la méthode
         var_dump($idVisiteur); // Vérifie si l'ID du visiteur est bien passé à la méthode
@@ -142,46 +141,6 @@ class PdoGsb
     ";
 
         // Préparer et exécuter la requête
-=======
-    /** 
-     * Retourne les informations d'un visiteur
-     * 
-     * @param String $login Login du visiteur
-     * 
-     * @return mdpVisiteur||mdpComptable sous la forme hacher
-     */
-    public function getMdpUtilisateur($login)
-    {
-        $requetePrepare = $this->connexion->prepare(
-            'SELECT mdp '
-                . 'FROM comptable '
-                . 'WHERE comptable.login = :unLogin'
-        );
-        $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
-        $requetePrepare->execute();
-        $comptable = $requetePrepare->fetch(PDO::FETCH_OBJ)->mdp;
-
-        if (isset($comptable)) {
-            return $comptable;
-        }
-
-        $requetePrepare = $this->connexion->prepare(
-            'SELECT mdp '
-                . 'FROM visiteur '
-                . 'WHERE visiteur.login = :unLogin'
-        );
-        $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
-        $requetePrepare->execute();
-        $visiteur = $requetePrepare->fetch(PDO::FETCH_OBJ)->mdp;
-
-        return $visiteur;
-    }
-
-
-    public function getMoisDisponibles(): array
-    {
-        $req = "SELECT DISTINCT mois FROM fichefrais ORDER BY mois DESC";
->>>>>>> db5c299 (Mise en place du hash avec des bug quand on ne rentre aucun mot de passe dans le formulaire de connexion)
         $stmt = $this->connexion->prepare($req);
         $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
         $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
@@ -520,14 +479,8 @@ class PdoGsb
      * @return un tableau associatif de clé un mois -aaaamm- et de valeurs
      *         l'année et le mois correspondant
      */
-<<<<<<< HEAD
     public function getLesMoisDisponibles($idVisiteur): array {
         // Préparation de la requête SQL
-=======
-    public function getLesMoisDisponibles($idVisiteur): array
-    {
-        // Requête SQL pour récupérer les mois où l'état est "CR" ou "CL"
->>>>>>> db5c299 (Mise en place du hash avec des bug quand on ne rentre aucun mot de passe dans le formulaire de connexion)
         $requetePrepare = $this->connexion->prepare(
             'SELECT fichefrais.mois AS mois FROM fichefrais '
                 . 'WHERE fichefrais.idvisiteur = :unIdVisiteur '
@@ -584,11 +537,7 @@ class PdoGsb
     public function getLesInfosFicheFrais($idVisiteur, $mois): array
     {
         $requetePrepare = $this->connexion->prepare(
-<<<<<<< HEAD
                 'SELECT fichefrais.idetat as idetat, '
-=======
-            'SELECT fichefrais.idetat as idEtat, '
->>>>>>> db5c299 (Mise en place du hash avec des bug quand on ne rentre aucun mot de passe dans le formulaire de connexion)
                 . 'fichefrais.datemodif as dateModif,'
                 . 'fichefrais.nbjustificatifs as nbJustificatifs, '
                 . 'fichefrais.montantvalide as montantValide, '

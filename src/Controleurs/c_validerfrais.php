@@ -11,80 +11,94 @@ if (!Utilitaires::estConnecteComptable()) {
 switch ($action) {
     case 'validerFrais':
 
-
         $lesVisiteurs = $pdo->getLesVisiteurs();
         $lesMois = [];
-<<<<<<< HEAD
-        $infosFicheFrais = [];
-<<<<<<< HEAD
-
-        // Si un visiteur a été sélectionné
-        if (isset($_POST['lstVisiteur'])) {
-            $idVisiteur = filter_input(INPUT_POST, 'lstVisiteur', FILTER_SANITIZE_STRING);
-            var_dump($idVisiteur); // Déboguer : Afficher l'ID du visiteur pour vérifier la récupération
-            // Récupérer les mois associés à ce visiteur
-            $lesMois = $pdo->getLesMoisDisponibles($idVisiteur);
-=======
-        $moisASelectionner = ''; // Initialiser la variable du mois sélectionné
-        $infosVisiteur = []; // Initialiser infosVisiteur comme un tableau vide
-        // Si un visiteur a été sélectionné
-=======
         $ficheFrais = [];
         $elementsForfaitises = [];
         $elementsHorsForfait = [];
         $moisASelectionner = '';
         $infosVisiteur = [];
 
->>>>>>> 21eb142 (ajout description éléments hors forfaitisés)
-        if (isset($_POST['lstVisiteur'])) {
-            $idVisiteur = filter_input(INPUT_POST, 'lstVisiteur', FILTER_SANITIZE_STRING);
-            $_SESSION['idVisiteur'] = $idVisiteur;
+        if (isset($_POST['lstVisiteurNomPrenom'])) {
+            $nomPrenom = filter_input(INPUT_POST, 'lstVisiteurNomPrenom', FILTER_SANITIZE_STRING);
+            $idVisiteur = $pdo->getIdVisiteurParNomPrenom($nomPrenom); // Ajoutez cette méthode dans PdoGsb
 
-            $lesMois = $pdo->getLesMoisDisponibles($idVisiteur);
+            if ($idVisiteur) {
+                $_SESSION['idVisiteur'] = $idVisiteur;
 
-            $infosVisiteur = $pdo->getVisiteurInfo($idVisiteur);
+                // Charger les mois disponibles pour ce visiteur
+                $lesMois = $pdo->getLesMoisDisponibles($idVisiteur);
 
-            $_SESSION['nomVisiteur'] = $infosVisiteur['nom'];
-            $_SESSION['prenomVisiteur'] = $infosVisiteur['prenom'];
->>>>>>> 9ba10ab (vivienne a disparu passons au élément forfaitisé)
+                // Charger les infos du visiteur pour affichage
+                $infosVisiteur = $pdo->getVisiteurInfo($idVisiteur);
+                $_SESSION['nomVisiteur'] = $infosVisiteur['nom'];
+                $_SESSION['prenomVisiteur'] = $infosVisiteur['prenom'];
+            } else {
+                Utilitaires::ajouterErreur("Visiteur non trouvé : $nomPrenom");
+                include PATH_VIEWS . 'v_erreurs.php';
+            }
         }
 
         if (isset($_POST['lstMois'])) {
             $mois = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_STRING);
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-            // Récupérer les éléments forfaitisés pour ce mois et ce visiteur
-            $infosFicheFrais = $pdo->getLesInfosFicheFrais($idVisiteur, $mois);
-=======
-            $moisASelectionner = $mois; 
-            $resultatsFicheFrais = $pdo->getLesInfosFicheFrais2($_SESSION['idVisiteur'], $mois);
-            $ficheFrais = $resultatsFicheFrais['ficheFrais'];
-            $elementsForfaitises = $resultatsFicheFrais['elementsForfaitises'];
-=======
             $_SESSION['moisSelectionne'] = $mois;
             $moisASelectionner = $mois;
->>>>>>> 68641ee (buton corriger et reintialiser element forfaitisé marche mais pas valider)
 
-            // Charger les frais pour ce mois
+            // Copier les frais forfaitisés dans la table temporaire
+            $pdo->copierFraisForfaitDansTemp($_SESSION['idVisiteur'], $mois);
+            $pdo->copierHorsForfaitDansTemp($_SESSION['idVisiteur'], $mois);
+
+            // Charger les frais depuis la table temporaire
             $elementsForfaitises = $pdo->getCopieFraisForfait($_SESSION['idVisiteur'], $mois);
             $elementsHorsForfait = $pdo->getElementsHorsForfait($_SESSION['idVisiteur'], $mois);
-<<<<<<< HEAD
->>>>>>> 21eb142 (ajout description éléments hors forfaitisés)
-=======
-            
-            $typeVehicule = $pdo->getTypeVehiculeVisiteur($_SESSION['idVisiteur']);
->>>>>>> 7f81521 (ajout indemnité kilometrique)
         }
 
         include PATH_VIEWS . 'v_valider_fiche_frais.php';
         break;
 
+    case 'validerCopieFraisForfait':
+        $idVisiteur = $_SESSION['idVisiteur'];
+        $mois = $_SESSION['moisSelectionne'];
+
+        if ($idVisiteur && $mois) {
+            // Validate forfaitized elements
+            $pdo->validerCopieFraisForfait($idVisiteur, $mois);
+
+            // Validate hors forfait elements
+            $pdo->validerTempHorsForfait($idVisiteur, $mois);
+
+            // Clear temporary tables
+            $pdo->clearTempFraisForfait($idVisiteur, $mois);
+            $pdo->clearTempHorsForfait($idVisiteur, $mois);
+
+            // Set a success message
+            $_SESSION['alert'] = 'Les éléments forfaitisés et hors forfait ont été validés avec succès.';
+        }
+
+        // Clear session and redirect to refresh the view
+        unset($_SESSION['idVisiteur'], $_SESSION['moisSelectionne']);
+        header('Location: index.php?uc=validerfrais&action=validerFrais');
+        exit;
+
+    case 'validerHorsForfait':
+        $idVisiteur = $_SESSION['idVisiteur'];
+        $mois = $_SESSION['moisSelectionne'];
+
+        // Call the method to replace original data with the temporary table
+        $pdo->validerTempHorsForfait($idVisiteur, $mois);
+
+        $_SESSION['alert'] = 'Les éléments hors forfait ont été validés avec succès.';
+
+        // Clear session and redirect to refresh the view
+        unset($_SESSION['idVisiteur'], $_SESSION['moisSelectionne']);
+        header('Location: index.php?uc=validerfrais&action=validerFrais');
+        exit;
+
     case 'corrigerReinitialiserForfait':
         $actionForfait = filter_input(INPUT_POST, 'actionForfait', FILTER_SANITIZE_STRING);
         $idVisiteur = $_SESSION['idVisiteur'];
         $mois = $_SESSION['moisSelectionne'];
-        $moisASelectionner = $mois; // Ajoutez cette ligne pour éviter l'erreur
+        $moisASelectionner = $mois;
 
         if ($actionForfait === 'corriger') {
             foreach ($_POST as $key => $value) {
@@ -102,34 +116,52 @@ switch ($action) {
 
         include PATH_VIEWS . 'v_valider_fiche_frais.php';
         break;
-<<<<<<< HEAD
-<<<<<<< HEAD
-}
-=======
-}
-?>
->>>>>>> 21eb142 (ajout description éléments hors forfaitisés)
-=======
 
-    case 'validerCopieFraisForfait':
-        $idVisiteur = $_SESSION['idVisiteur'] ?? null;
-        $mois = $_SESSION['moisSelectionne'] ?? null;
+    case 'corrigerReinitialiserHorsForfait':
+        $actionHorsForfait = filter_input(INPUT_POST, 'actionHorsForfait', FILTER_SANITIZE_STRING);
+        $idVisiteur = $_SESSION['idVisiteur'];
+        $mois = $_SESSION['moisSelectionne'];
+        $moisASelectionner = $mois;
 
-        if ($idVisiteur && $mois) {
-            $pdo->validerCopieFraisForfait($idVisiteur, $mois);
-
-            // Définir un message de succès dans la session
-            $_SESSION['alert'] = 'Fiche de frais validée avec succès.';
+        if ($actionHorsForfait === 'corriger') {
+            foreach ($_POST as $key => $value) {
+                if (strpos($key, 'libelle_') === 0) {
+                    $idFrais = str_replace('libelle_', '', $key);
+                    $libelle = $value;
+                    $pdo->updateTempHorsForfaitLibelle($idVisiteur, $mois, $idFrais, $libelle);
+                }
+                if (strpos($key, 'montant_') === 0) {
+                    $idFrais = str_replace('montant_', '', $key);
+                    $montant = $value;
+                    $pdo->updateTempHorsForfaitMontant($idVisiteur, $mois, $idFrais, $montant);
+                }
+                if (strpos($key, 'date_') === 0) {
+                    $idFrais = str_replace('date_', '', $key);
+                    $date = $value;
+                    $pdo->updateTempHorsForfaitDate($idVisiteur, $mois, $idFrais, $date);
+                }
+            }
+        } elseif ($actionHorsForfait === 'reinitialiser') {
+            $pdo->reinitialiserTempHorsForfait($idVisiteur, $mois);
         }
 
-        // Réinitialiser la session pour revenir à la sélection
-        unset($_SESSION['idVisiteur'], $_SESSION['moisSelectionne'], $_SESSION['nomVisiteur'], $_SESSION['prenomVisiteur']);
-
-        // Rediriger vers la page principale
-        header('Location: index.php?uc=validerfrais&action=validerFrais');
-        exit();
+        $elementsForfaitises = $pdo->getCopieFraisForfait($idVisiteur, $mois);
+        $elementsHorsForfait = $pdo->getTempHorsForfait($idVisiteur, $mois);
 
         include PATH_VIEWS . 'v_valider_fiche_frais.php';
         break;
+
+    case 'validerCopieHorsForfait':
+        $idVisiteur = $_SESSION['idVisiteur'];
+        $mois = $_SESSION['moisSelectionne'];
+
+        // Validate: replace originals with temporary data
+        $pdo->validerTempHorsForfait($idVisiteur, $mois);
+
+        // Clean temp table
+        $pdo->clearTempHorsForfait($idVisiteur, $mois);
+
+        $_SESSION['alert'] = 'Éléments hors forfait validés avec succès.';
+        header('Location: index.php?uc=validerfrais&action=validerFrais');
+        exit;
 }
->>>>>>> 68641ee (buton corriger et reintialiser element forfaitisé marche mais pas valider)
