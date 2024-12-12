@@ -189,7 +189,8 @@ datalist {
 .form-group {
     margin-top: 20px;
     display: flex;
-    justify-content: space-between;
+    /*margin : 20px;*/
+
 }
 
 .btn-valider, .btn-reinitialiser {
@@ -247,3 +248,13 @@ datalist option {
     color: black; /* Texte noir */
 }
 
+#lstVisiteur{
+    width: 165px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+#lstMois{
+    margin-left: 20px;
+    margin-right: 20px;
+}

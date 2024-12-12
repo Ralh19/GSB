@@ -777,12 +777,10 @@ class PdoGsb {
     }
 
     public function copierHorsForfaitDansTemp($idVisiteur, $mois) {
-        // Supprimer les anciennes données de la table temporaire
         $this->connexion->prepare(
                 'DELETE FROM temp_lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
         )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
 
-        // Copier les données de la table originale
         $this->connexion->prepare(
                 'INSERT INTO temp_lignefraishorsforfait (id, idvisiteur, mois, libelle, date, montant)
          SELECT id, idvisiteur, mois, libelle, date, montant
@@ -821,23 +819,35 @@ class PdoGsb {
     }
 
     public function validerTempHorsForfait($idVisiteur, $mois) {
-        // Supprimer les anciennes données dans la table principale
-        $this->connexion->prepare(
+        // Step 1: Delete the original data from lignefraishorsforfait
+        $deleteQuery = $this->connexion->prepare(
                 'DELETE FROM lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
-        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+        );
+        $deleteQuery->execute([
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+        ]);
 
-        // Copier les données de la table temporaire vers la table principale
-        $this->connexion->prepare(
+        // Step 2: Insert data from temp_lignefraishorsforfait into lignefraishorsforfait
+        $insertQuery = $this->connexion->prepare(
                 'INSERT INTO lignefraishorsforfait (id, idvisiteur, mois, libelle, date, montant)
          SELECT id, idvisiteur, mois, libelle, date, montant
          FROM temp_lignefraishorsforfait
          WHERE idvisiteur = :idVisiteur AND mois = :mois'
-        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+        );
+        $insertQuery->execute([
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+        ]);
 
-        // Nettoyer la table temporaire
-        $this->connexion->prepare(
+        // Step 3: Clear the temporary table
+        $clearQuery = $this->connexion->prepare(
                 'DELETE FROM temp_lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
-        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+        );
+        $clearQuery->execute([
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+        ]);
     }
 
     public function reinitialiserTempHorsForfait($idVisiteur, $mois) {
@@ -945,5 +955,9 @@ class PdoGsb {
         )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
     }
 
-    
+    public function clearTempHorsForfait($idVisiteur, $mois) {
+        $this->connexion->prepare(
+                'DELETE FROM temp_lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+    }
 }
