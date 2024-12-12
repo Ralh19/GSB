@@ -83,14 +83,26 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($elementsHorsForfait as $index => $element): ?>
+                        <?php foreach ($elementsHorsForfait as $element): ?>
                             <tr>
-                                <td><input type="date" name="date_<?= $index ?>" value="<?= htmlspecialchars($element['date']) ?>" ></td>
-                                <td><input type="text" name="libelle_<?= $index ?>" value="<?= htmlspecialchars($element['libelle']) ?>" ></td>
-                                <td><input type="number" name="montant_<?= $index ?>" value="<?= htmlspecialchars($element['montant']) ?>" step="0.01" ></td>
                                 <td>
-                                    <button type="button" class="btn btn-valider">Corriger</button>
-                                    <button type="button" class="btn btn-reinitialiser">Réinitialiser</button>
+                                    <input type="date" 
+                                           name="date_<?= htmlspecialchars($element['id'] ?? 'missing_id') ?>" 
+                                           value="<?= htmlspecialchars($element['date'] ?? '') ?>" required>
+                                </td>
+                                <td>
+                                    <input type="text" 
+                                           name="libelle_<?= htmlspecialchars($element['id'] ?? 'missing_id') ?>" 
+                                           value="<?= htmlspecialchars($element['libelle'] ?? '') ?>" required>
+                                </td>
+                                <td>
+                                    <input type="number" 
+                                           name="montant_<?= htmlspecialchars($element['id'] ?? 'missing_id') ?>" 
+                                           value="<?= htmlspecialchars($element['montant'] ?? '') ?>" step="0.01" required>
+                                </td>
+                                <td>
+                                    <button type="submit" class="btn btn-valider" name="actionHorsForfait" value="corriger">Corriger</button>
+                                    <button type="submit" class="btn btn-reinitialiser" name="actionHorsForfait" value="reinitialiser">Réinitialiser</button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -100,6 +112,7 @@
         </div>
     <?php endif; ?>
     <!-- Justificatifs et boutons -->
+    <!-- Justificatifs and final validation -->
     <?php if (isset($moisASelectionner) && !empty($moisASelectionner)): ?>
         <div class="justificatifs-actions">
             <div class="nb-justificatifs">
@@ -110,9 +123,6 @@
             <div class="btn-group" style="margin-top: 15px;">
                 <form method="post" action="index.php?uc=validerfrais&action=validerCopieFraisForfait">
                     <button type="submit" class="btn btn-valider">Valider</button>
-                </form>
-                <form method="post" action="index.php?uc=validerfrais&action=reinitialiserForfait">
-                    <button type="submit" class="btn btn-reinitialiser">Réinitialiser</button>
                 </form>
             </div>
         </div>
