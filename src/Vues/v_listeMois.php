@@ -29,6 +29,9 @@
                 <label for="lstMois" accesskey="n">Mois : </label>
                 <select id="lstMois" name="lstMois" class="form-control">
                     <?php
+                    
+                    var_dump($lesMois); // Affiche la structure de la variable pour vérifier son contenu
+
                     foreach ($lesMois as $unMois) {
                         $mois = $unMois['mois'];
                         $numAnnee = $unMois['numAnnee'];
