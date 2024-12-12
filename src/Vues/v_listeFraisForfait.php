@@ -1,4 +1,5 @@
 <div class="row">
+<div class="row">
     <h2>Renseigner ma fiche de frais du mois 
         <?php echo $numMois . '-' . $numAnnee ?>
     </h2>
@@ -12,6 +13,8 @@
                 foreach ($lesFraisForfait as $unFrais) {
                     $idFrais = $unFrais['idfrais'];
                     $libelle = htmlspecialchars($unFrais['libelle']);
+                    $quantite = $unFrais['quantite'];
+                    ?>
                     $quantite = $unFrais['quantite'];
                     ?>
                     <div class="form-group">

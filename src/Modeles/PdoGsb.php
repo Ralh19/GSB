@@ -184,10 +184,14 @@ class PdoGsb
 >>>>>>> db5c299 (Mise en place du hash avec des bug quand on ne rentre aucun mot de passe dans le formulaire de connexion)
         $stmt = $this->connexion->prepare($req);
         $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
         $stmt->execute();
 
         // Initialisation du tableau pour les mois
+        // Initialisation du tableau pour les mois
         $lesMois = [];
+
+        // Récupérer les résultats
 
         // Récupérer les résultats
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -200,6 +204,7 @@ class PdoGsb
                 'numMois' => $numMois
             ];
         }
+
 
         return $lesMois;
     }

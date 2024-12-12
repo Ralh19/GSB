@@ -11,6 +11,7 @@ if (!Utilitaires::estConnecteComptable()) {
 switch ($action) {
     case 'validerFrais':
 
+
         $lesVisiteurs = $pdo->getLesVisiteurs();
         $lesMois = [];
 <<<<<<< HEAD
