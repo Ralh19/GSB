@@ -17,8 +17,8 @@
  */
 ?>
 
-<!--<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -147,28 +147,12 @@
             <button type="submit">Submit</button>
         </form>
     </body>
-</html>-->
+</html>
 
 
 
-<?php
 
-require __DIR__ . "../vendor/autoload.php";
-
-use Dompdf\Dompdf;
-
-$dompdf = new Dompdf;
-
-$dompdf->loadHtml("Hello world");
-
-$dompdf->render();
-
-$dompdf->stream();
-?>
-
-
-
-<!--<div class="row">
+<div class="row">
     <div class="col-md-6 col-md-offset-3">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -204,4 +188,4 @@ $dompdf->stream();
             </div>
         </div>
     </div>
-</div>-->
+</div>
