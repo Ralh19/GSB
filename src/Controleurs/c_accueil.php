@@ -14,6 +14,7 @@
  * @version   GIT: <0>
  * @link      http://www.reseaucerta.org Contexte « Laboratoire GSB »
  */
+
 use Outils\Utilitaires;
 
 if (!Utilitaires::estConnecte()) {
@@ -36,5 +37,3 @@ if (Utilitaires::estConnecteVisiteur()) {
     header('Location: index.php?uc=connexion');
     exit();
 }
-
-

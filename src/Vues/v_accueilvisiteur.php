@@ -16,13 +16,13 @@
  */
 
 ?>
-<div class="alert alert-warning" role="alert"><strong>Rappel : </strong>Vos frais sont à déclarer au plus tard le dernier jour du mois 
-	et vos factures acquittées doivent être arrivées aux services comptables au plus tard le 10 du mois suivant la saisie.
-	Les éléments reçus après le 10 seront reportés sur le mois suivant.
+<div class="alert alert-warning" role="alert"><strong>Rappel : </strong>Vos frais sont à déclarer au plus tard le dernier jour du mois
+    et vos factures acquittées doivent être arrivées aux services comptables au plus tard le 10 du mois suivant la saisie.
+    Les éléments reçus après le 10 seront reportés sur le mois suivant.
 </div>
 <div id="accueil">
     <h2>
-        Gestion des frais<small> - Visiteur : 
+        Gestion des frais<small> - Visiteur :
             <?= $_SESSION['prenom'] . ' ' . $_SESSION['nom'] ?></small>
     </h2>
 </div>
@@ -39,11 +39,11 @@
                 <div class="row">
                     <div class="col-xs-12 col-md-12">
                         <a href="index.php?uc=gererFrais&action=saisirFrais"
-                           class="btn btn-success btn-lg" role="button">
+                            class="btn btn-success btn-lg" role="button">
                             <span class="glyphicon glyphicon-pencil"></span>
                             <br>Renseigner la fiche de frais</a>
                         <a href="index.php?uc=etatFrais&action=selectionnerMois"
-                           class="btn btn-primary btn-lg" role="button">
+                            class="btn btn-primary btn-lg" role="button">
                             <span class="glyphicon glyphicon-list-alt"></span>
                             <br>Afficher mes fiches de frais</a>
                     </div>

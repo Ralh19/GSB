@@ -5,9 +5,9 @@
             <?php
             foreach ($lesFraisForfait as $unFraisForfait) {
                 $libelle = $unFraisForfait['libelle'];
-                ?>
+            ?>
                 <th> <?php echo htmlspecialchars($libelle) ?></th>
-                <?php
+            <?php
             }
             ?>
         </tr>
@@ -15,15 +15,15 @@
             <?php
             foreach ($lesFraisForfait as $unFraisForfait) {
                 $quantite = $unFraisForfait['quantite'];
-                ?>
+            ?>
                 <td class="qteForfait"><?php echo $quantite ?> </td>
-                <?php
+            <?php
             }
             ?>
         </tr>
     </table>
     <!-- Affichage spécifique de l'indemnité kilométrique -->
-<?php if (isset($indemniteKilometrique) && isset($typeVehicule)): ?>
+    <?php if (isset($indemniteKilometrique) && isset($typeVehicule)): ?>
         <table class="table table-bordered table-responsive">
             <tr>
                 <th>Type de véhicule</th>
@@ -34,5 +34,5 @@
                 <td><?php echo number_format($indemniteKilometrique, 2); ?> €</td>
             </tr>
         </table>
-<?php endif; ?>
+    <?php endif; ?>
 </div>

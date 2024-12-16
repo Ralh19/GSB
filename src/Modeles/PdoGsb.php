@@ -136,6 +136,7 @@ class PdoGsb
      */
     public function getMdpUtilisateur($login)
     {
+        // Requête pour récupérer le mot de passe du comptable
         $requetePrepare = $this->connexion->prepare(
             'SELECT mdp '
                 . 'FROM comptable '
@@ -143,12 +144,14 @@ class PdoGsb
         );
         $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
         $requetePrepare->execute();
-        $comptable = $requetePrepare->fetch(PDO::FETCH_OBJ)->mdp;
+        $comptable = $requetePrepare->fetch(PDO::FETCH_OBJ);
 
-        if (isset($comptable)) {
-            return $comptable;
+        // Si un comptable a été trouvé, retourner le mot de passe
+        if ($comptable) {
+            return $comptable->mdp;
         }
 
+        // Requête pour récupérer le mot de passe du visiteur si aucun comptable n'est trouvé
         $requetePrepare = $this->connexion->prepare(
             'SELECT mdp '
                 . 'FROM visiteur '
@@ -156,9 +159,15 @@ class PdoGsb
         );
         $requetePrepare->bindParam(':unLogin', $login, PDO::PARAM_STR);
         $requetePrepare->execute();
-        $visiteur = $requetePrepare->fetch(PDO::FETCH_OBJ)->mdp;
+        $visiteur = $requetePrepare->fetch(PDO::FETCH_OBJ);
 
-        return $visiteur;
+        // Si un visiteur a été trouvé, retourner le mot de passe
+        if ($visiteur) {
+            return $visiteur->mdp;
+        }
+
+        // Si aucun utilisateur n'est trouvé, retourner une chaîne vide
+        return '';
     }
 
 
@@ -498,6 +507,8 @@ class PdoGsb
      * @return un tableau associatif de clé un mois -aaaamm- et de valeurs
      *         l'année et le mois correspondant
      */
+
+
     public function getLesMoisDisponibles($idVisiteur): array
     {
         // Requête SQL pour récupérer les mois où l'état est "CR" ou "CL"
@@ -706,6 +717,20 @@ class PdoGsb
         $requete->execute();
     }
 
+    public function getIdVisiteurParNomPrenom(string $nomPrenom): ?string
+    {
+        $requetePrepare = $this->connexion->prepare(
+            'SELECT id 
+         FROM visiteur 
+         WHERE CONCAT(nom, " ", prenom) = :nomPrenom'
+        );
+        $requetePrepare->bindParam(':nomPrenom', $nomPrenom, PDO::PARAM_STR);
+        $requetePrepare->execute();
+
+        $result = $requetePrepare->fetch(PDO::FETCH_ASSOC);
+        return $result['id'] ?? null;
+    }
+
     public function validerFraisForfait($idVisiteur, $mois)
     {
         $this->connexion->prepare(
@@ -747,6 +772,32 @@ class PdoGsb
         return $elementsForfaitises;
     }
 
+    public function getFicheFrais($idVisiteur, $mois): array
+    {
+        $requetePrepare = $this->connexion->prepare(
+            'SELECT idetat, montantvalide, datemodif, nbjustificatifs 
+         FROM fichefrais 
+         WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $requetePrepare->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requetePrepare->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requetePrepare->execute();
+
+        $ficheFrais = $requetePrepare->fetch(PDO::FETCH_ASSOC);
+
+        if ($ficheFrais) {
+            return [
+                'idEtat' => $ficheFrais['idetat'],
+                'montantValide' => $ficheFrais['montantvalide'],
+                'dateModif' => $ficheFrais['datemodif'],
+                'nbJustificatifs' => $ficheFrais['nbjustificatifs'],
+            ];
+        }
+
+        // Retourne un tableau vide si aucune fiche de frais n'est trouvée
+        return [];
+    }
+
     public function validerCopieFraisForfait(string $idVisiteur, string $mois): void
     {
         // Supprimer les anciens enregistrements dans la table principale
@@ -762,6 +813,29 @@ class PdoGsb
             'INSERT INTO lignefraisforfait (idvisiteur, mois, idfraisforfait, quantite)
          SELECT idvisiteur, mois, idfraisforfait, quantite
          FROM temp_lignefraisforfait
+         WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $requeteInsert->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requeteInsert->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requeteInsert->execute();
+    }
+
+    public function copierLigneFraisForfait($idVisiteur, $mois): void
+    {
+        // Supprimer les anciennes données pour éviter les doublons
+        $requeteDelete = $this->connexion->prepare(
+            'DELETE FROM temp_lignefraisforfait 
+         WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $requeteDelete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requeteDelete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requeteDelete->execute();
+
+        // Copier les données depuis lignefraisforfait
+        $requeteInsert = $this->connexion->prepare(
+            'INSERT INTO temp_lignefraisforfait (idvisiteur, mois, idfraisforfait, quantite)
+         SELECT idvisiteur, mois, idfraisforfait, quantite
+         FROM lignefraisforfait
          WHERE idvisiteur = :idVisiteur AND mois = :mois'
         );
         $requeteInsert->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
@@ -803,5 +877,227 @@ class PdoGsb
         $stmt->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC)['typeVehicule'] ?? '4CV Diesel'; // Valeur par défaut
+    }
+
+    public function clearTempFraisForfait($idVisiteur, $mois): void
+    {
+        $requete = $this->connexion->prepare(
+            'DELETE FROM temp_lignefraisforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requete->execute();
+    }
+
+    public function copierFraisForfaitDansTemp($idVisiteur, $mois): void
+    {
+        // Supprimer d'abord les données existantes pour ce visiteur et mois
+        $requeteDelete = $this->connexion->prepare(
+            'DELETE FROM temp_lignefraisforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $requeteDelete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requeteDelete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requeteDelete->execute();
+
+        // Copier les données de lignefraisforfait vers temp_lignefraisforfait
+        $requeteInsert = $this->connexion->prepare(
+            'INSERT INTO temp_lignefraisforfait (idvisiteur, mois, idfraisforfait, quantite)
+         SELECT idvisiteur, mois, idfraisforfait, quantite
+         FROM lignefraisforfait
+         WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $requeteInsert->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requeteInsert->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requeteInsert->execute();
+    }
+
+    public function copierHorsForfaitDansTemp($idVisiteur, $mois)
+    {
+        $requete = $this->connexion->prepare(
+            'INSERT INTO temp_lignefraishorsforfait (id, idvisiteur, mois, libelle, date, montant)
+         SELECT lhf.id, lhf.idvisiteur, lhf.mois, lhf.libelle, lhf.date, lhf.montant
+         FROM lignefraishorsforfait lhf
+         WHERE lhf.idvisiteur = :idVisiteur AND lhf.mois = :mois
+         AND NOT EXISTS (
+             SELECT 1 FROM temp_lignefraishorsforfait t
+             WHERE t.id = lhf.id
+         )'
+        );
+        $requete->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+    }
+
+    public function getTempHorsForfait($idVisiteur, $mois)
+    {
+        $requete = $this->connexion->prepare(
+            'SELECT id, libelle, montant, date 
+         FROM temp_lignefraishorsforfait
+         WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requete->execute();
+
+        return $requete->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function updateTempHorsForfait($idVisiteur, $mois, $idHorsForfait, $libelle, $montant, $date)
+    {
+        $requete = $this->connexion->prepare(
+            'UPDATE temp_lignefraishorsforfait
+         SET libelle = :libelle, montant = :montant, date = :date
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idHorsForfait'
+        );
+        $requete->execute([
+            ':libelle' => $libelle,
+            ':montant' => $montant,
+            ':date' => $date,
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+            ':idHorsForfait' => $idHorsForfait
+        ]);
+    }
+
+    public function validerTempHorsForfait($idVisiteur, $mois)
+    {
+        // Step 1: Delete the original data from lignefraishorsforfait
+        $deleteQuery = $this->connexion->prepare(
+            'DELETE FROM lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $deleteQuery->execute([
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+        ]);
+
+        // Step 2: Insert data from temp_lignefraishorsforfait into lignefraishorsforfait
+        $insertQuery = $this->connexion->prepare(
+            'INSERT INTO lignefraishorsforfait (id, idvisiteur, mois, libelle, date, montant)
+         SELECT id, idvisiteur, mois, libelle, date, montant
+         FROM temp_lignefraishorsforfait
+         WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $insertQuery->execute([
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+        ]);
+
+        // Step 3: Clear the temporary table
+        $clearQuery = $this->connexion->prepare(
+            'DELETE FROM temp_lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $clearQuery->execute([
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+        ]);
+    }
+
+    public function reinitialiserTempHorsForfait($idVisiteur, $mois)
+    {
+        $requete = $this->connexion->prepare(
+            'DELETE FROM temp_lignefraishorsforfait
+         WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+
+        $requete->execute();
+
+        // Reinsérer depuis la table `lignefraishorsforfait`
+        $requete = $this->connexion->prepare(
+            'INSERT INTO temp_lignefraishorsforfait (id, idvisiteur, mois, libelle, montant, date)
+         SELECT id, idvisiteur, mois, libelle, montant, date
+         FROM lignefraishorsforfait
+         WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+
+        $requete->execute();
+    }
+
+    public function updateTempHorsForfaitLibelle($idVisiteur, $mois, $idHorsForfait, $libelle)
+    {
+        $requete = $this->connexion->prepare(
+            'UPDATE temp_lignefraishorsforfait
+         SET libelle = :libelle
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idHorsForfait'
+        );
+        $requete->execute([
+            ':libelle' => $libelle,
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+            ':idHorsForfait' => $idHorsForfait
+        ]);
+    }
+
+    public function updateTempHorsForfaitMontant($idVisiteur, $mois, $idHorsForfait, $montant)
+    {
+        $requete = $this->connexion->prepare(
+            'UPDATE temp_lignefraishorsforfait
+         SET montant = :montant
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idHorsForfait'
+        );
+        $requete->execute([
+            ':montant' => $montant,
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+            ':idHorsForfait' => $idHorsForfait
+        ]);
+    }
+
+    public function updateTempHorsForfaitDate($idVisiteur, $mois, $idHorsForfait, $date)
+    {
+        $requete = $this->connexion->prepare(
+            'UPDATE temp_lignefraishorsforfait
+         SET date = :date
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idHorsForfait'
+        );
+        $requete->execute([
+            ':date' => $date,
+            ':idVisiteur' => $idVisiteur,
+            ':mois' => $mois,
+            ':idHorsForfait' => $idHorsForfait
+        ]);
+    }
+
+    public function validerCopieHorsForfait($idVisiteur, $mois)
+    {
+        // Supprimer uniquement les lignes de ce mois
+        $requeteDelete = $this->connexion->prepare(
+            'DELETE FROM lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $requeteDelete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requeteDelete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requeteDelete->execute();
+
+        // Copier les lignes depuis la table temporaire
+        $requeteInsert = $this->connexion->prepare(
+            'INSERT INTO lignefraishorsforfait (id, idvisiteur, mois, libelle, date, montant)
+         SELECT id, idvisiteur, mois, libelle, date, montant
+         FROM temp_lignefraishorsforfait
+         WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        );
+        $requeteInsert->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requeteInsert->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requeteInsert->execute();
+    }
+
+    public function clearTablesTemp($idVisiteur, $mois)
+    {
+        $this->connexion->prepare(
+            'DELETE FROM temp_lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+
+        $this->connexion->prepare(
+            'DELETE FROM temp_lignefraisforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
+    }
+
+    public function clearTempHorsForfait($idVisiteur, $mois)
+    {
+        $this->connexion->prepare(
+            'DELETE FROM temp_lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
     }
 }
