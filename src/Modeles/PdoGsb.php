@@ -967,4 +967,58 @@ class PdoGsb {
                 'DELETE FROM temp_lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
         )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
     }
+
+    public function calculerMoisSuivant(string $mois): string {
+        $annee = (int) substr($mois, 0, 4);
+        $moisInt = (int) substr($mois, 4, 2);
+
+        if ($moisInt === 12) {
+            $annee++;
+            $moisInt = 1;
+        } else {
+            $moisInt++;
+        }
+
+        return sprintf('%04d%02d', $annee, $moisInt);
+    }
+
+    public function marquerHorsForfaitCommeReporte(string $idVisiteur, string $mois, int $idFrais): void {
+        $requete = $this->connexion->prepare(
+                'UPDATE temp_lignefraishorsforfait
+         SET libelle = CONCAT("Reporté : ", libelle)
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idFrais'
+        );
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requete->bindParam(':idFrais', $idFrais, PDO::PARAM_INT);
+        $requete->execute();
+    }
+
+    public function ajouterHorsForfait(string $idVisiteur, string $mois, string $libelle, float $montant, string $date): void {
+        $requete = $this->connexion->prepare(
+                'INSERT INTO lignefraishorsforfait (idvisiteur, mois, libelle, montant, date)
+         VALUES (:idVisiteur, :mois, :libelle, :montant, :date)'
+        );
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requete->bindParam(':libelle', $libelle, PDO::PARAM_STR);
+        $requete->bindParam(':montant', $montant, PDO::PARAM_STR);
+        $requete->bindParam(':date', $date, PDO::PARAM_STR);
+        $requete->execute();
+    }
+
+    public function getHorsForfaitReportes(string $idVisiteur, string $mois): array {
+        $requete = $this->connexion->prepare(
+                'SELECT id, libelle, montant, date 
+         FROM temp_lignefraishorsforfait
+         WHERE idvisiteur = :idVisiteur 
+         AND mois = :mois
+         AND libelle LIKE "Reporté : %"'
+        );
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requete->execute();
+
+        return $requete->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
