@@ -820,35 +820,23 @@ class PdoGsb {
     }
 
     public function validerTempHorsForfait($idVisiteur, $mois) {
-        // Step 1: Delete the original data from lignefraishorsforfait
-        $deleteQuery = $this->connexion->prepare(
+        // Supprimer les anciens frais dans la table principale
+        $this->connexion->prepare(
                 'DELETE FROM lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
-        );
-        $deleteQuery->execute([
-            ':idVisiteur' => $idVisiteur,
-            ':mois' => $mois,
-        ]);
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
 
-        // Step 2: Insert data from temp_lignefraishorsforfait into lignefraishorsforfait
-        $insertQuery = $this->connexion->prepare(
-                'INSERT INTO lignefraishorsforfait (id, idvisiteur, mois, libelle, date, montant)
-         SELECT id, idvisiteur, mois, libelle, date, montant
+        // Insérer les données depuis la table temporaire
+        $this->connexion->prepare(
+                'INSERT INTO lignefraishorsforfait (id, idvisiteur, mois, libelle, date, montant, refuse)
+         SELECT id, idvisiteur, mois, libelle, date, montant, refuse 
          FROM temp_lignefraishorsforfait
          WHERE idvisiteur = :idVisiteur AND mois = :mois'
-        );
-        $insertQuery->execute([
-            ':idVisiteur' => $idVisiteur,
-            ':mois' => $mois,
-        ]);
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
 
-        // Step 3: Clear the temporary table
-        $clearQuery = $this->connexion->prepare(
+        // Nettoyer la table temporaire
+        $this->connexion->prepare(
                 'DELETE FROM temp_lignefraishorsforfait WHERE idvisiteur = :idVisiteur AND mois = :mois'
-        );
-        $clearQuery->execute([
-            ':idVisiteur' => $idVisiteur,
-            ':mois' => $mois,
-        ]);
+        )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
     }
 
     public function reinitialiserTempHorsForfait($idVisiteur, $mois) {
@@ -968,20 +956,6 @@ class PdoGsb {
         )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
     }
 
-    public function calculerMoisSuivant(string $mois): string {
-        $annee = (int) substr($mois, 0, 4);
-        $moisInt = (int) substr($mois, 4, 2);
-
-        if ($moisInt === 12) {
-            $annee++;
-            $moisInt = 1;
-        } else {
-            $moisInt++;
-        }
-
-        return sprintf('%04d%02d', $annee, $moisInt);
-    }
-
     public function marquerHorsForfaitCommeReporte(string $idVisiteur, string $mois, int $idFrais): void {
         $requete = $this->connexion->prepare(
                 'UPDATE temp_lignefraishorsforfait
@@ -1020,5 +994,63 @@ class PdoGsb {
         $requete->execute();
 
         return $requete->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function reporterHorsForfait($idVisiteur, $mois, $idFrais, $moisSuivant) {
+        // Mettre à jour le mois de l'élément dans la table lignefraishorsforfait
+        $requete = $this->connexion->prepare(
+                'UPDATE lignefraishorsforfait
+         SET mois = :moisSuivant
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idFrais'
+        );
+        $requete->bindParam(':moisSuivant', $moisSuivant, PDO::PARAM_STR);
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requete->bindParam(':idFrais', $idFrais, PDO::PARAM_INT);
+        $requete->execute();
+    }
+
+    public function calculerMoisSuivant(string $moisActuel): string {
+        // Extraire l'année et le mois de la chaîne au format "YYYYMM"
+        $annee = (int) substr($moisActuel, 0, 4);
+        $mois = (int) substr($moisActuel, 4, 2);
+
+        // Passer au mois suivant
+        $mois++;
+
+        // Si le mois dépasse 12, passer à l'année suivante
+        if ($mois > 12) {
+            $mois = 1; // Repartir à janvier
+            $annee++; // Passer à l'année suivante
+        }
+
+        // Formater le mois en deux chiffres (par exemple, "01" pour janvier)
+        $moisSuivant = sprintf('%02d', $mois);
+
+        // Retourner la chaîne sous le format "YYYYMM"
+        return $annee . $moisSuivant;
+    }
+
+    public function refuserTempHorsForfait($idVisiteur, $mois, $idFrais) {
+        $requete = $this->connexion->prepare(
+                'UPDATE temp_lignefraishorsforfait 
+         SET libelle = CONCAT(libelle, " (refusé)"), refuse = 1 
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idFrais'
+        );
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requete->bindParam(':idFrais', $idFrais, PDO::PARAM_INT);
+        $requete->execute();
+    }
+
+    public function supprimerTempHorsForfait($idVisiteur, $mois, $idFrais) {
+        $requete = $this->connexion->prepare(
+                'DELETE FROM temp_lignefraishorsforfait 
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idFrais'
+        );
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requete->bindParam(':idFrais', $idFrais, PDO::PARAM_INT);
+        $requete->execute();
     }
 }

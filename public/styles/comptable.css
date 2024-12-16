@@ -193,7 +193,7 @@ datalist {
 
 }
 
-.btn-valider, .btn-reinitialiser, .btn-reporter {
+.btn-valider, .btn-reinitialiser, .btn-reporter, .btn-refuser {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -217,6 +217,13 @@ datalist {
 .btn-reinitialiser:hover {
     background-color: #e53935;
 }
+
+.btn-refuser {
+    background-color: #f44335; /* Rouge pour Réinitialiser */
+    color: white;
+}
+
+
 
 /* Section des justificatifs et actions */
 .justificatifs-actions {
