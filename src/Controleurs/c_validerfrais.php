@@ -60,25 +60,24 @@ switch ($action) {
         $idVisiteur = $_SESSION['idVisiteur'];
         $mois = $_SESSION['moisSelectionne'];
 
-        if ($idVisiteur && $mois) {
-            // Validate forfaitized elements
-            $pdo->validerCopieFraisForfait($idVisiteur, $mois);
+        // Validation des éléments forfaitisés
+        $pdo->validerCopieFraisForfait($idVisiteur, $mois);
 
-            // Validate hors forfait elements
-            $pdo->validerTempHorsForfait($idVisiteur, $mois);
-
-            // Clear temporary tables
-            $pdo->clearTempFraisForfait($idVisiteur, $mois);
-            $pdo->clearTempHorsForfait($idVisiteur, $mois);
-
-            // Set a success message
-            $_SESSION['alert'] = 'Les éléments forfaitisés et hors forfait ont été validés avec succès.';
+        // Traiter les éléments hors forfait reportés
+        $elementsReportes = $pdo->getHorsForfaitReportes($idVisiteur, $mois);
+        foreach ($elementsReportes as $element) {
+            $moisSuivant = $pdo->calculerMoisSuivant($mois);
+            $pdo->ajouterHorsForfait($idVisiteur, $moisSuivant, $element['libelle'], $element['montant'], $element['date']);
+            $pdo->supprimerTempHorsForfait($idVisiteur, $mois, $element['id']);
         }
 
-        // Clear session and redirect to refresh the view
-        unset($_SESSION['idVisiteur'], $_SESSION['moisSelectionne']);
+        // Nettoyer les données temporaires
+        $pdo->clearTempFraisForfait($idVisiteur, $mois);
+        $pdo->clearTempHorsForfait($idVisiteur, $mois);
+
+        $_SESSION['alert'] = 'Fiche de frais validée avec succès.';
         header('Location: index.php?uc=validerfrais&action=validerFrais');
-        exit;
+        exit();
 
     case 'validerHorsForfait':
         $idVisiteur = $_SESSION['idVisiteur'];
@@ -121,7 +120,6 @@ switch ($action) {
         $actionHorsForfait = filter_input(INPUT_POST, 'actionHorsForfait', FILTER_SANITIZE_STRING);
         $idVisiteur = $_SESSION['idVisiteur'];
         $mois = $_SESSION['moisSelectionne'];
-        $moisASelectionner = $mois;
 
         if ($actionHorsForfait === 'corriger') {
             foreach ($_POST as $key => $value) {
@@ -143,6 +141,12 @@ switch ($action) {
             }
         } elseif ($actionHorsForfait === 'reinitialiser') {
             $pdo->reinitialiserTempHorsForfait($idVisiteur, $mois);
+        } elseif (strpos($actionHorsForfait, 'reporter_') === 0) {
+            // Récupérer l'ID de l'élément à reporter
+            $idFrais = str_replace('reporter_', '', $actionHorsForfait);
+
+            // Marquer comme "reporté" dans la table temporaire
+            $pdo->marquerHorsForfaitCommeReporte($idVisiteur, $mois, $idFrais);
         }
         
         $moisASelectionner = $mois;
@@ -188,5 +192,4 @@ switch ($action) {
 
         include PATH_VIEWS . 'v_valider_fiche_frais.php';
         break;
-
 }
