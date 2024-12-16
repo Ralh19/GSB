@@ -1,4 +1,5 @@
 <div class="row">
+<div class="row">
     <h2>Renseigner ma fiche de frais du mois 
         <?php echo $numMois . '-' . $numAnnee ?>
     </h2>
@@ -14,6 +15,8 @@
                     $libelle = htmlspecialchars($unFrais['libelle']);
                     $quantite = $unFrais['quantite'];
                     ?>
+                    $quantite = $unFrais['quantite'];
+                    ?>
                     <div class="form-group">
                         <label for="idFrais"><?php echo $libelle ?></label>
                         <input type="text" id="idFrais" 
@@ -25,6 +28,8 @@
                     <?php
                 }
                 ?>
+                <!-- Section pour le type de véhicule et indemnité kilométrique -->
+
                 <!-- Section pour le type de véhicule et indemnité kilométrique -->
 
                 <button class="btn btn-success" type="submit">Ajouter</button>

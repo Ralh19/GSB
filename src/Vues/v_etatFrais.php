@@ -32,6 +32,8 @@
             <tr>
                 <td><?php echo htmlspecialchars($typeVehicule); ?></td>
                 <td><?php echo number_format($indemniteKilometrique, 2); ?> €</td>
+                <td><?php echo htmlspecialchars($typeVehicule); ?></td>
+                <td><?php echo number_format($indemniteKilometrique, 2); ?> €</td>
             </tr>
         </table>
     <?php endif; ?>
