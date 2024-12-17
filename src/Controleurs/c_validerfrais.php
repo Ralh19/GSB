@@ -144,14 +144,11 @@ switch ($action) {
             }
         } elseif ($actionHorsForfait === 'reinitialiser') {
             $pdo->reinitialiserTempHorsForfait($idVisiteur, $mois);
-        } elseif ($actionHorsForfait === 'refuser') {
-            // Récupérer l'ID de l'élément hors forfait
-            $idFrais = filter_input(INPUT_POST, 'idFrais', FILTER_SANITIZE_NUMBER_INT);
-            if ($idFrais) {
-                // Mettre à jour le libellé dans la table temporaire avec "(refusé)"
-                $pdo->updateTempHorsForfaitLibelle($idVisiteur, $mois, $idFrais, "(refusé)");
-            }
+        } elseif (strpos($actionHorsForfait, 'refuser_') === 0) {
+            $idFrais = str_replace('refuser_', '', $actionHorsForfait);
+            $pdo->marquerHorsForfaitCommeRefuse($idVisiteur, $mois, $idFrais);
         }
+
 
         // Recharger les données pour affichage
         $moisASelectionner = $mois;

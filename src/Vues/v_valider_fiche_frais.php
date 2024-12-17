@@ -103,6 +103,10 @@
                                 <td>
                                     <button type="submit" class="btn btn-valider" name="actionHorsForfait" value="corriger">Corriger</button>
                                     <button type="submit" class="btn btn-reinitialiser" name="actionHorsForfait" value="reinitialiser">Réinitialiser</button>
+                                    <button type="submit" class="btn btn-danger" 
+                                            name="actionHorsForfait" value="refuser_<?= htmlspecialchars($element['id'] ?? '') ?>">
+                                        Refuser
+                                    </button>
                                     <button type="submit" class="btn btn-reporter" name="actionHorsForfait" value="reporter">Reporter</button>
 
                                 </td>   

@@ -790,17 +790,17 @@ class PdoGsb {
         $requete->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
     }
 
-    public function getTempHorsForfait($idVisiteur, $mois) {
-        $requete = $this->connexion->prepare(
-                'SELECT id, libelle, montant, date 
+    public function getTempHorsForfait($idVisiteur, $mois): array {
+        $requetePrepare = $this->connexion->prepare(
+                'SELECT id, date, libelle, montant 
          FROM temp_lignefraishorsforfait
          WHERE idvisiteur = :idVisiteur AND mois = :mois'
         );
-        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
-        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
-        $requete->execute();
+        $requetePrepare->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requetePrepare->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requetePrepare->execute();
 
-        return $requete->fetchAll(PDO::FETCH_ASSOC);
+        return $requetePrepare->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function updateTempHorsForfait($idVisiteur, $mois, $idHorsForfait, $libelle, $montant, $date) {
@@ -1051,5 +1051,31 @@ class PdoGsb {
             ':idVisiteur' => $idVisiteur,
             ':mois' => $mois
         ]);
+    }
+
+    public function refuserTempHorsForfait($idVisiteur, $mois, $idFrais): void {
+        $requete = $this->connexion->prepare(
+                'UPDATE temp_lignefraishorsforfait
+         SET libelle = CONCAT(libelle, " (Refusé)")
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idFrais'
+        );
+
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requete->bindParam(':idFrais', $idFrais, PDO::PARAM_INT);
+
+        $requete->execute();
+    }
+
+    public function marquerHorsForfaitCommeRefuse($idVisiteur, $mois, $idFrais): void {
+        $requete = $this->connexion->prepare(
+                'UPDATE temp_lignefraishorsforfait 
+         SET libelle = CONCAT(libelle, " (Refusé)") 
+         WHERE idvisiteur = :idVisiteur AND mois = :mois AND id = :idFrais'
+        );
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
+        $requete->bindParam(':idFrais', $idFrais, PDO::PARAM_INT);
+        $requete->execute();
     }
 }
