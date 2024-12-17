@@ -968,20 +968,6 @@ class PdoGsb {
         )->execute([':idVisiteur' => $idVisiteur, ':mois' => $mois]);
     }
 
-    public function calculerMoisSuivant(string $mois): string {
-        $annee = (int) substr($mois, 0, 4);
-        $moisInt = (int) substr($mois, 4, 2);
-
-        if ($moisInt === 12) {
-            $annee++;
-            $moisInt = 1;
-        } else {
-            $moisInt++;
-        }
-
-        return sprintf('%04d%02d', $annee, $moisInt);
-    }
-
     public function marquerHorsForfaitCommeReporte(string $idVisiteur, string $mois, int $idFrais): void {
         $requete = $this->connexion->prepare(
                 'UPDATE temp_lignefraishorsforfait
@@ -1077,5 +1063,58 @@ class PdoGsb {
         $requete->bindParam(':mois', $mois, PDO::PARAM_STR);
         $requete->bindParam(':idFrais', $idFrais, PDO::PARAM_INT);
         $requete->execute();
+    }
+
+    public function calculerMoisSuivant($moisActuel) {
+        $annee = (int) substr($moisActuel, 0, 4);
+        $mois = (int) substr($moisActuel, 4, 2);
+
+        if ($mois == 12) {
+            $mois = 1;
+            $annee++;
+        } else {
+            $mois++;
+        }
+
+        return sprintf('%04d%02d', $annee, $mois);
+    }
+
+    public function reporterHorsForfait($idVisiteur, $moisActuel, $idFrais, $moisSuivant) {
+        // Récupérer l'élément à reporter depuis la table temporaire
+        $requete = $this->connexion->prepare(
+                'SELECT libelle, montant, date 
+         FROM temp_lignefraishorsforfait 
+         WHERE idvisiteur = :idVisiteur AND mois = :moisActuel AND id = :idFrais'
+        );
+        $requete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+        $requete->bindParam(':moisActuel', $moisActuel, PDO::PARAM_STR);
+        $requete->bindParam(':idFrais', $idFrais, PDO::PARAM_INT);
+        $requete->execute();
+
+        $element = $requete->fetch(PDO::FETCH_ASSOC);
+
+        if ($element) {
+            // Ajouter l'élément dans la table originale pour le mois suivant
+            $requeteInsert = $this->connexion->prepare(
+                    'INSERT INTO lignefraishorsforfait (idvisiteur, mois, libelle, montant, date) 
+             VALUES (:idVisiteur, :moisSuivant, :libelle, :montant, :date)'
+            );
+            $requeteInsert->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+            $requeteInsert->bindParam(':moisSuivant', $moisSuivant, PDO::PARAM_STR);
+            $requeteInsert->bindParam(':libelle', $element['libelle'], PDO::PARAM_STR);
+            $requeteInsert->bindParam(':montant', $element['montant'], PDO::PARAM_STR);
+            $requeteInsert->bindParam(':date', $element['date'], PDO::PARAM_STR);
+            $requeteInsert->execute();
+
+            // Supprimer l'élément de la table temporaire
+            $requeteDelete = $this->connexion->prepare(
+                    'DELETE FROM temp_lignefraishorsforfait 
+             WHERE idvisiteur = :idVisiteur AND mois = :moisActuel AND id = :idFrais'
+            );
+            $requeteDelete->bindParam(':idVisiteur', $idVisiteur, PDO::PARAM_STR);
+            $requeteDelete->bindParam(':moisActuel', $moisActuel, PDO::PARAM_STR);
+            $requeteDelete->bindParam(':idFrais', $idFrais, PDO::PARAM_INT);
+            $requeteDelete->execute();
+        }
     }
 }

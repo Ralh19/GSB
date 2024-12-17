@@ -147,7 +147,20 @@ switch ($action) {
         } elseif (strpos($actionHorsForfait, 'refuser_') === 0) {
             $idFrais = str_replace('refuser_', '', $actionHorsForfait);
             $pdo->marquerHorsForfaitCommeRefuse($idVisiteur, $mois, $idFrais);
+        } elseif (strpos($actionHorsForfait, 'reporter_') === 0) {
+            $idFrais = str_replace('reporter_', '', $actionHorsForfait);
+            if ($idFrais) {
+                // Calculer le mois suivant
+                $moisSuivant = $pdo->calculerMoisSuivant($mois);
+
+                // Reporter l'élément dans le mois suivant
+                $pdo->reporterHorsForfait($idVisiteur, $mois, $idFrais, $moisSuivant);
+
+                // Ajouter une alerte
+                $_SESSION['alert'] = 'L\'élément a bien été reporté au mois suivant.';
+            }
         }
+
 
 
         // Recharger les données pour affichage
