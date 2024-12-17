@@ -103,11 +103,7 @@
                                 <td>
                                     <button type="submit" class="btn btn-valider" name="actionHorsForfait" value="corriger">Corriger</button>
                                     <button type="submit" class="btn btn-reinitialiser" name="actionHorsForfait" value="reinitialiser">Réinitialiser</button>
-                                    <button type="submit" class="btn btn-refuser" name="actionHorsForfait" value="refuser_<?= htmlspecialchars($element['id'] ?? '') ?>">Refuser</button>
-                                    <span>
-                                        <?= isset($element['refuse']) && $element['refuse'] ? '<em>(Refusé)</em>' : '' ?>
-                                    </span>
-                                    <button type="submit" class="btn btn-reporter" name="actionHorsForfait" value="reporter_<?= isset($element['id']) ? htmlspecialchars($element['id']) : 'missing_id' ?>">Reporter</button>
+                                    <button type="submit" class="btn btn-reporter" name="actionHorsForfait" value="reporter">Reporter</button>
 
                                 </td>   
                             </tr>
@@ -128,7 +124,7 @@
                        value="<?= htmlspecialchars($ficheFrais['nbJustificatifs'] ?? '0') ?>" >
             </div>
             <div class="btn-group" style="margin-top: 15px;">
-                <form method="post" action="index.php?uc=validerfrais&action=validerCopieFraisForfait">
+                <form method="post" action="index.php?uc=validerfrais&action=validerToutesCopiesFrais">
                     <button type="submit" class="btn btn-valider">Valider</button>
                 </form>
                 <form method="post" action="index.php?uc=validerfrais&action=reinitialiserTout">

@@ -56,14 +56,17 @@ switch ($action) {
         include PATH_VIEWS . 'v_valider_fiche_frais.php';
         break;
 
-    case 'validerCopieFraisForfait':
+    case 'validerToutesCopiesFrais':
         $idVisiteur = $_SESSION['idVisiteur'];
         $mois = $_SESSION['moisSelectionne'];
 
-        // Validation des éléments forfaitisés
+        // 1. Valider les éléments forfaitisés
         $pdo->validerCopieFraisForfait($idVisiteur, $mois);
 
-        // Traiter les éléments hors forfait reportés
+        // 2. Valider les éléments hors forfaitisés
+        $pdo->validerTempHorsForfait($idVisiteur, $mois);
+
+        // 3. Gérer les éléments hors forfait reportés (si nécessaire)
         $elementsReportes = $pdo->getHorsForfaitReportes($idVisiteur, $mois);
         foreach ($elementsReportes as $element) {
             $moisSuivant = $pdo->calculerMoisSuivant($mois);
@@ -71,11 +74,14 @@ switch ($action) {
             $pdo->supprimerTempHorsForfait($idVisiteur, $mois, $element['id']);
         }
 
-        // Nettoyer les données temporaires
+        // 4. Nettoyer les tables temporaires
         $pdo->clearTempFraisForfait($idVisiteur, $mois);
         $pdo->clearTempHorsForfait($idVisiteur, $mois);
 
-        $_SESSION['alert'] = 'Fiche de frais validée avec succès.';
+        // Message de confirmation
+        $_SESSION['alert'] = 'Toutes les modifications ont été validées avec succès.';
+
+        // Redirection pour rafraîchir la vue
         header('Location: index.php?uc=validerfrais&action=validerFrais');
         exit();
 
@@ -125,51 +131,35 @@ switch ($action) {
             foreach ($_POST as $key => $value) {
                 if (strpos($key, 'libelle_') === 0) {
                     $idFrais = str_replace('libelle_', '', $key);
-                    $libelle = $value;
-                    $pdo->updateTempHorsForfaitLibelle($idVisiteur, $mois, $idFrais, $libelle);
+                    $pdo->updateTempHorsForfaitLibelle($idVisiteur, $mois, $idFrais, $value);
                 }
                 if (strpos($key, 'montant_') === 0) {
                     $idFrais = str_replace('montant_', '', $key);
-                    $montant = $value;
-                    $pdo->updateTempHorsForfaitMontant($idVisiteur, $mois, $idFrais, $montant);
+                    $pdo->updateTempHorsForfaitMontant($idVisiteur, $mois, $idFrais, $value);
                 }
                 if (strpos($key, 'date_') === 0) {
                     $idFrais = str_replace('date_', '', $key);
-                    $date = $value;
-                    $pdo->updateTempHorsForfaitDate($idVisiteur, $mois, $idFrais, $date);
+                    $pdo->updateTempHorsForfaitDate($idVisiteur, $mois, $idFrais, $value);
                 }
             }
         } elseif ($actionHorsForfait === 'reinitialiser') {
             $pdo->reinitialiserTempHorsForfait($idVisiteur, $mois);
-        } elseif (strpos($actionHorsForfait, 'reporter_') === 0) {
-            // Récupérer l'ID de l'élément à reporter
-            $idFrais = str_replace('reporter_', '', $actionHorsForfait);
-
-            // Marquer comme "reporté" dans la table temporaire
-            $pdo->marquerHorsForfaitCommeReporte($idVisiteur, $mois, $idFrais);
+        } elseif ($actionHorsForfait === 'refuser') {
+            // Récupérer l'ID de l'élément hors forfait
+            $idFrais = filter_input(INPUT_POST, 'idFrais', FILTER_SANITIZE_NUMBER_INT);
+            if ($idFrais) {
+                // Mettre à jour le libellé dans la table temporaire avec "(refusé)"
+                $pdo->updateTempHorsForfaitLibelle($idVisiteur, $mois, $idFrais, "(refusé)");
+            }
         }
-        
-        $moisASelectionner = $mois;
 
+        // Recharger les données pour affichage
+        $moisASelectionner = $mois;
         $elementsForfaitises = $pdo->getCopieFraisForfait($idVisiteur, $mois);
         $elementsHorsForfait = $pdo->getTempHorsForfait($idVisiteur, $mois);
 
         include PATH_VIEWS . 'v_valider_fiche_frais.php';
         break;
-
-    case 'validerCopieHorsForfait':
-        $idVisiteur = $_SESSION['idVisiteur'];
-        $mois = $_SESSION['moisSelectionne'];
-
-        // Validate: replace originals with temporary data
-        $pdo->validerTempHorsForfait($idVisiteur, $mois);
-
-        // Clean temp table
-        $pdo->clearTempHorsForfait($idVisiteur, $mois);
-
-        $_SESSION['alert'] = 'Éléments hors forfait validés avec succès.';
-        header('Location: index.php?uc=validerfrais&action=validerFrais');
-        exit;
 
     case 'reinitialiserTout':
         $idVisiteur = $_SESSION['idVisiteur'];
