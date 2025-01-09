@@ -7,19 +7,27 @@
         ?>
     <?php endif; ?>
     <h2>Validation des fiches de frais</h2>
+    <div id="allForms">
+        <form method="post" action="index.php?uc=validerfrais&action=validerFrais">
+            <div class="form-group form-row">
+                <label for="lstVisiteur">Choisir le visiteur :</label>
+                <input list="visiteurs" name="lstVisiteurNomPrenom" id="lstVisiteur" class="form-control" required placeholder="Saisir le nom du visiteur">
+                <datalist id="visiteurs">
+                    <?php foreach ($lesVisiteurs as $visiteur): ?>
+                        <option value="<?= htmlspecialchars($visiteur['nom'] . ' ' . $visiteur['prenom']) ?>"></option>
+                    <?php endforeach; ?>
+                </datalist>
+                <button type="submit" class="btn btn-suivant">Suivant</button>
+            </div>
+        </form>
 
-    <form method="post" action="index.php?uc=validerfrais&action=validerFrais">
-        <div class="form-group form-row">
-            <label for="lstVisiteur">Choisir le visiteur :</label>
-            <input list="visiteurs" name="lstVisiteurNomPrenom" id="lstVisiteur" class="form-control" required placeholder="Saisir le nom du visiteur">
-            <datalist id="visiteurs">
-                <?php foreach ($lesVisiteurs as $visiteur): ?>
-                    <option value="<?= htmlspecialchars($visiteur['nom'] . ' ' . $visiteur['prenom']) ?>"></option>
-                <?php endforeach; ?>
-            </datalist>
-            <button type="submit" class="btn btn-suivant">Suivant</button>
-        </div>
-    </form>
+        <form method="post" action="index.php?uc=validerfrais&action=telechargerPdf">
+            <div class="form-group form-row">
+                <button type="submit" class="btn btn-suivant">Télécharger PDF</button>
+            </div>
+        </form>
+    </div>
+
 
     <!-- Formulaire de sélection du mois -->
     <?php if (isset($lesMois) && !empty($lesMois)): ?>

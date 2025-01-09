@@ -55,6 +55,9 @@ switch ($uc) {
     case 'validerfrais': 
         include PATH_CTRLS . 'c_validerfrais.php';
         break;
+    case 'validerfrais': 
+        include PATH_CTRLS . 'c_validerfrais.php';
+        break;
     case 'deconnexion':
         include PATH_CTRLS . 'c_deconnexion.php';
         break;
