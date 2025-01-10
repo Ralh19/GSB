@@ -20,7 +20,7 @@ switch ($action) {
         $infosVisiteur = [];
 
         if (isset($_POST['lstVisiteurNomPrenom'])) {
-            $nomPrenom = filter_input(INPUT_POST, 'lstVisiteurNomPrenom', FILTER_SANITIZE_STRING);
+            $nomPrenom = filter_input(INPUT_POST, 'lstVisiteurNomPrenom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $idVisiteur = $pdo->getIdVisiteurParNomPrenom($nomPrenom); // Ajoutez cette méthode dans PdoGsb
 
             if ($idVisiteur) {
@@ -40,7 +40,7 @@ switch ($action) {
         }
 
         if (isset($_POST['lstMois'])) {
-            $mois = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_STRING);
+            $mois = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $_SESSION['moisSelectionne'] = $mois;
             $moisASelectionner = $mois;
 
@@ -100,7 +100,7 @@ switch ($action) {
         exit;
 
     case 'corrigerReinitialiserForfait':
-        $actionForfait = filter_input(INPUT_POST, 'actionForfait', FILTER_SANITIZE_STRING);
+        $actionForfait = filter_input(INPUT_POST, 'actionForfait', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $idVisiteur = $_SESSION['idVisiteur'];
         $mois = $_SESSION['moisSelectionne'];
         $moisASelectionner = $mois;
@@ -123,7 +123,7 @@ switch ($action) {
         break;
 
     case 'corrigerReinitialiserHorsForfait':
-        $actionHorsForfait = filter_input(INPUT_POST, 'actionHorsForfait', FILTER_SANITIZE_STRING);
+        $actionHorsForfait = filter_input(INPUT_POST, 'actionHorsForfait', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $idVisiteur = $_SESSION['idVisiteur'];
         $mois = $_SESSION['moisSelectionne'];
 

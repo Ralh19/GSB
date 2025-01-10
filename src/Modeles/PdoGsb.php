@@ -234,14 +234,14 @@ class PdoGsb
         return $lesLignes;
     }
 
-    public function validerFicheFrais($idVisiteur, $mois)
-    {
-        $req = "UPDATE fichefrais SET idetat = 'VA' WHERE idvisiteur = :idVisiteur AND mois = :mois";
-        $stmt = PdoGsb::$monPdo->prepare($req);
-        $stmt->bindParam(':idVisiteur', $idVisiteur);
-        $stmt->bindParam(':mois', $mois);
-        $stmt->execute();
-    }
+    // public function validerFicheFrais($idVisiteur, $mois)
+    // {
+    //     $req = "UPDATE fichefrais SET idetat = 'VA' WHERE idvisiteur = :idVisiteur AND mois = :mois";
+    //     $stmt = PdoGsb::$monPdo->prepare($req);
+    //     $stmt->bindParam(':idVisiteur', $idVisiteur);
+    //     $stmt->bindParam(':mois', $mois);
+    //     $stmt->execute();
+    // }
 
     /**
      * Retourne le nombre de justificatif d'un visiteur pour un mois donné
