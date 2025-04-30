@@ -31,6 +31,21 @@ function getLesVisiteurs($pdo)
 }
 
 /**
+ * Fonction qui retourne la liste des comptables
+ *
+ * @param PDO $pdo instance de la classe PDO utilisée pour se connecter
+ *
+ * @return Array de comptables.
+ */
+function getLesComptables($pdo)
+{
+    $req = 'select * from comptable';
+    $res = $pdo->query($req);
+    $lesLignes = $res->fetchAll();
+    return $lesLignes;
+}
+
+/**
  * Fonction générique qui retourne le nombre d'enregistrements d'une table
  *
  * @param PDO    $pdo   Instance de la classe PDO utilisée pour se connecter

@@ -37,6 +37,15 @@ CREATE TABLE IF NOT EXISTS visiteur (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS comptable (
+    idcomptable Char(5) NOT NULL,
+    nom char(25) DEFAULT NULL,
+    prenom char(25)  DEFAULT NULL,
+    login char(25) DEFAULT NULL,
+    mdp char(255) DEFAULT NULL,
+    PRIMARY KEY (idcomptable)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS fichefrais (
   idvisiteur char(5) NOT NULL,
   mois char(6) NOT NULL,
@@ -71,6 +80,8 @@ CREATE TABLE IF NOT EXISTS lignefraishorsforfait (
 ) ENGINE=InnoDB;
 
 -- Alimentation des données paramètres
+INSERT INTO comptable VALUES ('c0uco', 'Charrier', 'Logan', 'l.charrier','test');
+
 INSERT INTO fraisforfait (id, libelle, montant) VALUES
 ('ETP', 'Forfait Etape', 110.00),
 ('KM', 'Frais Kilométrique', 0.62),

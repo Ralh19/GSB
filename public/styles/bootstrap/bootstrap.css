@@ -299,7 +299,6 @@ th {
 }
 .glyphicon-pencil:before {
   content: "\270f";
-
 }
 .glyphicon-glass:before {
   content: "\e001";
@@ -4100,9 +4099,6 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   color: #fff;
   background-color: #337ab7;
 }
-
-.list-group-item.active > .badge,
-
 .nav-stacked > li {
   float: none;
 }

@@ -29,30 +29,35 @@
                 <label for="lstMois" accesskey="n">Mois : </label>
                 <select id="lstMois" name="lstMois" class="form-control">
                     <?php
-                    foreach ($lesMois as $unMois) {
-                        $mois = $unMois['mois'];
-                        $numAnnee = $unMois['numAnnee'];
-                        $numMois = $unMois['numMois'];
-                        if ($mois == $moisASelectionner) {
-                            ?>
-                            <option selected value="<?php echo $mois ?>">
-                                <?php echo $numMois . '/' . $numAnnee ?> </option>
-                            <?php
-                        } else {
-                            ?>
-                            <option value="<?php echo $mois ?>">
-                                <?php echo $numMois . '/' . $numAnnee ?> </option>
-                            <?php
+                    if (empty($lesMois)) {
+                        ?>
+                        <option disabled selected>Pas de fiche de frais disponible</option>
+                        <?php
+                    } else {
+                        foreach ($lesMois as $unMois) {
+                            $mois = $unMois['mois'];
+                            $numAnnee = $unMois['numAnnee'];
+                            $numMois = $unMois['numMois'];
+                            if ($mois == $moisASelectionner) {
+                                ?>
+                                <option selected value="<?php echo $mois ?>">
+                                    <?php echo $numMois . '/' . $numAnnee ?> </option>
+                                <?php
+                            } else {
+                                ?>
+                                <option value="<?php echo $mois ?>">
+                                    <?php echo $numMois . '/' . $numAnnee ?> </option>
+                                <?php
+                            }
                         }
                     }
                     ?>    
-
                 </select>
             </div>
-            <input id="ok" type="submit" value="Valider" class="btn btn-success" 
-                   role="button">
-            <input id="annuler" type="reset" value="Effacer" class="btn btn-danger" 
-                   role="button">
+            <?php if (!empty($lesMois)) { ?>
+                <input id="ok" type="submit" value="Valider" class="btn btn-success" role="button">
+            <?php } ?>
+            <input id="annuler" type="reset" value="Effacer" class="btn btn-danger" role="button">
         </form>
     </div>
 </div>
