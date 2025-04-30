@@ -63,7 +63,7 @@
             <div class="form-group">
                 <label for="txtDateHF">Date (jj/mm/aaaa): </label>
                 <input type="date" id="txtDateHF" name="dateFrais" 
-                       class="form-control" id ="text">
+                       class="form-control" id="text">
             </div>
             <div class="form-group">
                 <label for="txtLibelleHF">Libellé</label>             
