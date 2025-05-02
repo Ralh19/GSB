@@ -28,44 +28,28 @@
               role="form">
             <fieldset>       
                 <?php
+                // Initialisation pour le bloc véhicule unique
+                $typesVehicules = [
+                    'E4' => 'Véhicule 4CV Essence',
+                    'E5' => 'Véhicule 5/6CV Essence',
+                    'V4' => 'Véhicule 4CV Diesel',
+                    'V5' => 'Véhicule 5/6CV Diesel'
+                ];
+                $vehiculeActuel = '';
+                $kmActuels = '';
+
                 foreach ($lesFraisForfait as $unFrais) {
                     $idFrais = $unFrais['idfrais'];
                     $quantite = $unFrais['quantite'];
 
-                    // Si c’est un frais véhicule, on le gère à part
-                    if (in_array($idFrais, ['KM', 'V4', 'V5', 'E4', 'E5'])) {
-                        $typesVehicules = [
-                            'V4' => 'Véhicule 4CV Diesel',
-                            'V5' => 'Véhicule 5/6CV Diesel',
-                            'E4' => 'Véhicule 4CV Essence',
-                            'E5' => 'Véhicule 5/6CV Essence'
-                        ];
-                        ?>
-                        <div class="form-group">
-                            <label for="vehiculeType">Véhicule</label>
-                            <div class="row">
-                                <div class="col-xs-6">
-                                    <select name="vehicule[id]" id="vehiculeType" class="form-control">
-                                        <option value="">-- Sélectionner --</option>
-                                        <?php foreach ($typesVehicules as $code => $label) { ?>
-                                            <option value="<?php echo $code ?>" <?php if ($code === $idFrais) echo 'selected'; ?>>
-                                                <?php echo $label ?>
-                                            </option>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-                                <div class="col-xs-6">
-                                    <input type="text" name="vehicule[quantite]" class="form-control" 
-                                           value="<?php echo $quantite ?>" placeholder="Km">
-                                </div>
-                            </div>
-                        </div>
-                        <?php
-                        // On a géré ce champ, on saute à la prochaine itération
+                    // Si frais véhicule, on retient les données
+                    if (array_key_exists($idFrais, $typesVehicules)) {
+                        $vehiculeActuel = $idFrais;
+                        $kmActuels = $quantite;
                         continue;
                     }
 
-                    // Affichage classique pour les autres frais
+                    // Autres frais forfaitisés
                     $libelle = htmlspecialchars($unFrais['libelle']);
                     ?>
                     <div class="form-group">
@@ -78,6 +62,28 @@
                     </div>
                 <?php } ?>
 
+                <!-- Bloc unique pour le véhicule -->
+                <div class="form-group">
+                    <label for="vehiculeType">Véhicule</label>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <select name="vehicule[id]" id="vehiculeType" class="form-control">
+                                <option value="">-- Sélectionner --</option>
+                                <?php foreach ($typesVehicules as $code => $label) { ?>
+                                    <option value="<?php echo $code ?>" <?php if ($code === $vehiculeActuel) echo 'selected'; ?>>
+                                        <?php echo $label ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                        <div class="col-xs-6">
+                            <input type="text" name="vehicule[quantite]" id="vehiculeKm" class="form-control" 
+                                   value="<?php echo $kmActuels ?>" placeholder="Km">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boutons -->
                 <button class="btn btn-success" type="submit">Ajouter</button>
                 <button class="btn btn-danger" type="reset">Effacer</button>
             </fieldset>
